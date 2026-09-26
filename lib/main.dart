@@ -1,5 +1,7 @@
 import 'dart:io';
 
+// فقط EpubReader لازم است؛ کلاس Image این پکیج با Image فلاتر تداخل دارد
+import 'package:epubx/epubx.dart' show EpubReader;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,6 +12,7 @@ import 'about_page.dart';
 import 'data/store.dart';
 import 'dictionary/dictionary_service.dart';
 import 'privacy_page.dart';
+import 'reader/epub_document.dart';
 import 'reader/epub_screen.dart';
 import 'reader/pdf_screen.dart';
 import 'theme/paper_glass_theme.dart';
@@ -138,15 +141,20 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       }
       await File(src).copy(dest);
 
+      // فراداده‌ی واقعی کتاب (عنوان، نویسنده، کاور) جای نام فایل می‌نشیند
+      final meta = await _readMetadata(dest, type);
+
       await ref.read(libraryProvider.notifier).import(LibraryBook(
             path: dest,
-            title: base,
+            title: meta?.title ?? base,
             type: type,
             addedAt: DateTime.now(),
+            coverPath: meta?.coverPath,
+            author: meta?.author,
           ));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('📖 «$base» به کتابخانه اضافه شد')));
+            SnackBar(content: Text('📖 «${meta?.title ?? base}» به کتابخانه اضافه شد')));
       }
     } catch (e) {
       if (mounted) {
@@ -155,6 +163,37 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       }
     } finally {
       if (mounted) setState(() => _importing = false);
+    }
+  }
+
+  /// خواندن عنوان/نویسنده/کاور از خود فایل EPUB.
+  /// برای PDF فراداده‌ای در دسترس نیست و به نام فایل تکیه می‌کنیم.
+  Future<_BookMetadata?> _readMetadata(String path, String type) async {
+    if (type != 'epub') return null;
+    try {
+      final bytes = await File(path).readAsBytes();
+      final book = await EpubReader.readBook(bytes);
+      final doc = EpubDocument.fromBook(book);
+
+      String? coverPath;
+      final cover = doc.coverBytes;
+      if (cover != null && cover.isNotEmpty) {
+        // کاور کنار فایل کتاب ذخیره می‌شود تا با حذف کتاب پاک شود
+        final file = File('$path.cover');
+        await file.writeAsBytes(cover, flush: true);
+        coverPath = file.path;
+      }
+
+      final title = doc.title?.trim();
+      final author = doc.author?.trim();
+      return _BookMetadata(
+        title: (title == null || title.isEmpty) ? null : title,
+        author: (author == null || author.isEmpty) ? null : author,
+        coverPath: coverPath,
+      );
+    } catch (_) {
+      // فراداده خوانده نشد — همان نام فایل استفاده می‌شود
+      return null;
     }
   }
 
@@ -264,25 +303,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                          colors: [
-                                            Colors.deepPurple.shade400,
-                                            Colors.black87
-                                          ]),
-                                    ),
-                                    padding: const EdgeInsets.all(10),
-                                    alignment: Alignment.bottomRight,
-                                    child: Text(b.title,
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w800)),
-                                  ),
-                                ),
+                                Expanded(child: _BookCover(book: b)),
                                 Padding(
                                   padding: const EdgeInsets.all(8),
                                   child: Column(
@@ -290,12 +311,25 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                          b.type == 'epub'
-                                              ? 'EPUB • ${(b.progress * 100).round()}٪ خوانده'
-                                              : 'PDF • صفحه ${b.lastPage}',
+                                        b.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                      if (b.author != null) ...[
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          b.author!,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: Theme.of(context)
                                               .textTheme
-                                              .bodySmall),
+                                              .bodySmall
+                                              ?.copyWith(fontSize: 11),
+                                        ),
+                                      ],
                                       const SizedBox(height: 6),
                                       LinearProgressIndicator(
                                           value: b.progress.clamp(0.0, 1.0)),
@@ -319,6 +353,80 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               icon: const Icon(Icons.add),
               label: const Text('افزودن کتاب'),
             ),
+    );
+  }
+}
+
+class _BookMetadata {
+  final String? title;
+  final String? author;
+  final String? coverPath;
+  const _BookMetadata({this.title, this.author, this.coverPath});
+}
+
+/// کاور کتاب: تصویر واقعی اگر موجود باشد، وگرنه یک جلد تولیدی
+/// که از عنوان و یک رنگ پایدار مشتق می‌شود.
+class _BookCover extends StatelessWidget {
+  final LibraryBook book;
+  const _BookCover({required this.book});
+
+  @override
+  Widget build(BuildContext context) {
+    final path = book.coverPath;
+    if (path != null && path.isNotEmpty) {
+      final file = File(path);
+      if (file.existsSync()) {
+        return Image.file(
+          file,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          errorBuilder: (_, __, ___) => _fallback(context),
+        );
+      }
+    }
+    return _fallback(context);
+  }
+
+  Widget _fallback(BuildContext context) {
+    // رنگ از روی مسیر فایل مشتق می‌شود تا برای هر کتاب ثابت بماند
+    final hue = (book.path.hashCode.abs() % 360).toDouble();
+    final base = HSLColor.fromAHSL(1, hue, 0.32, 0.34).toColor();
+    final top = HSLColor.fromAHSL(1, hue, 0.30, 0.20).toColor();
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [top, base],
+        ),
+      ),
+      padding: const EdgeInsets.all(10),
+      alignment: Alignment.bottomRight,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            book.isEpub ? Icons.auto_stories : Icons.picture_as_pdf,
+            color: Colors.white.withOpacity(0.75),
+            size: 22,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            book.title,
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12.5,
+              height: 1.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -376,7 +484,11 @@ class BookmarksPage extends ConsumerWidget {
       MaterialPageRoute(
         builder: (_) => found.type == 'epub'
             ? EpubReaderScreen(
-                path: found.path, title: found.title, initialPage: pageIndex)
+                path: found.path,
+                title: found.title,
+                // در EPUB شماره ذخیره‌شده یک‌based است، ریدر صفر‌based می‌خواهد
+                initialSection: pageIndex > 0 ? pageIndex - 1 : null,
+              )
             : PdfReaderScreen(
                 path: found.path, title: found.title, initialPage: pageIndex),
       ),
@@ -401,22 +513,6 @@ class BookmarksPage extends ConsumerWidget {
       ),
     );
     return ok == true;
-  }
-
-  Widget _empty(BuildContext context, IconData icon, String title,
-      String hint) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 64, color: Theme.of(context).disabledColor),
-          const SizedBox(height: 12),
-          Text(title),
-          const SizedBox(height: 6),
-          Text(hint, style: Theme.of(context).textTheme.bodySmall),
-        ],
-      ),
-    );
   }
 
   @override
@@ -445,8 +541,11 @@ class BookmarksPage extends ConsumerWidget {
           children: [
             // ── تب نشان‌ها ──
             marks.isEmpty
-                ? _empty(context, Icons.bookmark_border, 'هنوز نشانی نداری',
-                    'داخل ریدر دکمه بوکمارک را بزن')
+                ? const _EmptyHint(
+                    icon: Icons.bookmark_border,
+                    title: 'هنوز نشانی نداری',
+                    hint: 'داخل ریدر دکمه بوکمارک را بزن',
+                  )
                 : ListView.builder(
                     itemCount: marks.length,
                     itemBuilder: (c, i) {
@@ -492,118 +591,454 @@ class BookmarksPage extends ConsumerWidget {
                     },
                   ),
             // ── تب هایلایت‌ها ──
-            highlights.isEmpty
-                ? _empty(context, Icons.highlight_alt, 'هایلایتی نداری',
-                    'متن را در EPUB انتخاب کن یا در PDF دکمه هایلایت بزن')
-                : ListView.builder(
-                    itemCount: highlights.length,
-                    itemBuilder: (c, i) {
-                      final h = highlights[i];
-                      return Dismissible(
-                        key: ValueKey('hl-${h.id}'),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          color: Colors.red.shade700,
-                          alignment: Alignment.centerLeft,
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 20),
-                          child:
-                              const Icon(Icons.delete, color: Colors.white),
-                        ),
-                        onDismissed: (_) => ref
-                            .read(highlightsProvider.notifier)
-                            .removeEntry(h),
-                        child: ListTile(
-                          leading: Container(
-                            width: 12,
-                            height: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Color(h.color),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                          ),
-                          title: Text(
-                            h.quote,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          subtitle: Text(
-                              '${h.book} • بخش/صفحه ${h.pageIndex}'),
-                          trailing: IconButton(
-                            tooltip: 'حذف هایلایت',
-                            icon: const Icon(Icons.delete_outline,
-                                size: 20),
-                            onPressed: () async {
-                              if (await _confirmDelete(
-                                  context,
-                                  'حذف هایلایت؟',
-                                  'این هایلایت حذف شود؟')) {
-                                await ref
-                                    .read(highlightsProvider.notifier)
-                                    .removeEntry(h);
-                              }
-                            },
-                          ),
-                          onTap: () => _openBook(context, ref,
-                              bookPath: h.bookPath, pageIndex: h.pageIndex),
-                        ),
-                      );
-                    },
-                  ),
+            const _HighlightsTab(),
             // ── تب لایتنر ──
-            cards.isEmpty
-                ? _empty(context, Icons.style, 'لایتنر خالی است',
-                    'در دیکشنری دکمه «لایتنر» را بزن')
-                : ListView.builder(
-                    itemCount: cards.length,
-                    itemBuilder: (c, i) {
-                      final f = cards[i];
-                      return Dismissible(
-                        key: ValueKey('fc-${f.id}'),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          color: Colors.red.shade700,
-                          alignment: Alignment.centerLeft,
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 20),
-                          child:
-                              const Icon(Icons.delete, color: Colors.white),
-                        ),
-                        onDismissed: (_) => ref
-                            .read(flashcardsProvider.notifier)
-                            .removeEntry(f),
-                        child: ListTile(
-                          leading: const Icon(Icons.style,
-                              color: Color(0xFF7CB342)),
-                          title: Text(f.word,
-                              textDirection: TextDirection.ltr),
-                          subtitle: Text(
-                            f.context.isNotEmpty
-                                ? '${f.meaning} — «${f.context}»'
-                                : f.meaning,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          trailing: IconButton(
-                            tooltip: 'تلفظ',
-                            icon: const Icon(Icons.volume_up, size: 20),
-                            onPressed: () => DictionaryService.instance
-                                .speak(f.word),
-                          ),
-                          onLongPress: () async {
-                            if (await _confirmDelete(context, 'حذف کارت؟',
-                                'کارت «${f.word}» حذف شود؟')) {
-                              await ref
-                                  .read(flashcardsProvider.notifier)
-                                  .removeEntry(f);
-                            }
-                          },
-                        ),
-                      );
-                    },
-                  ),
+            const _FlashcardsTab(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// تب هایلایت‌ها با جستجوی متن کامل روی پایگاه داده.
+class _HighlightsTab extends ConsumerStatefulWidget {
+  const _HighlightsTab();
+
+  @override
+  ConsumerState<_HighlightsTab> createState() => _HighlightsTabState();
+}
+
+class _HighlightsTabState extends ConsumerState<_HighlightsTab> {
+  final _ctrl = TextEditingController();
+
+  /// null یعنی حالت عادی (بدون جستجو)
+  List<HighlightEntry>? _results;
+  bool _searching = false;
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _runSearch(String q) async {
+    setState(() => _searching = true);
+    final hits = await ref.read(highlightsProvider.notifier).search(q);
+    if (!mounted) return;
+    setState(() {
+      _results = hits;
+      _searching = false;
+    });
+  }
+
+  void _clear() {
+    _ctrl.clear();
+    setState(() => _results = null);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final all = ref.watch(highlightsProvider);
+    final items = _results ?? all;
+    final searching = _searching;
+
+    if (all.isEmpty) {
+      return const _EmptyHint(
+        icon: Icons.highlight_alt,
+        title: 'هایلایتی نداری',
+        hint: 'متن را در EPUB انتخاب کن یا در PDF دکمه هایلایت بزن',
+      );
+    }
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+          child: TextField(
+            controller: _ctrl,
+            textInputAction: TextInputAction.search,
+            decoration: InputDecoration(
+              hintText: 'جستجو در هایلایت‌ها...',
+              prefixIcon: const Icon(Icons.search, size: 20),
+              suffixIcon: _ctrl.text.isEmpty
+                  ? null
+                  : IconButton(
+                      icon: const Icon(Icons.close, size: 18),
+                      onPressed: _clear,
+                    ),
+              isDense: true,
+              border: const OutlineInputBorder(),
+            ),
+            onChanged: (v) {
+              if (v.trim().length >= 2) {
+                _runSearch(v);
+              } else if (v.trim().isEmpty) {
+                _clear();
+              } else {
+                setState(() {});
+              }
+            },
+          ),
+        ),
+        if (searching) const LinearProgressIndicator(minHeight: 2),
+        Expanded(
+          child: items.isEmpty
+              ? const _EmptyHint(
+                  icon: Icons.search_off,
+                  title: 'نتیجه‌ای پیدا نشد',
+                  hint: 'عبارت دیگری را امتحان کن',
+                )
+              : ListView.builder(
+                  itemCount: items.length,
+                  itemBuilder: (c, i) {
+                    final h = items[i];
+                    return Dismissible(
+                      key: ValueKey('hl-${h.id}'),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        color: Colors.red.shade700,
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      onDismissed: (_) =>
+                          ref.read(highlightsProvider.notifier).removeEntry(h),
+                      child: ListTile(
+                        leading: Container(
+                          width: 12,
+                          height: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Color(h.color),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                        title: Text(
+                          h.quote,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                            '${h.book} • بخش/صفحه ${h.pageIndex}'
+                            '${h.note.isEmpty ? '' : ' • ${h.note}'}'),
+                        trailing: IconButton(
+                          tooltip: 'حذف هایلایت',
+                          icon: const Icon(Icons.delete_outline, size: 20),
+                          onPressed: () => ref
+                              .read(highlightsProvider.notifier)
+                              .removeEntry(h),
+                        ),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) {
+                              final found = ref
+                                  .read(libraryProvider)
+                                  .where((b) => b.path == h.bookPath)
+                                  .firstOrNull;
+                              if (found == null) {
+                                return const _MissingBook();
+                              }
+                              return found.isEpub
+                                  ? EpubReaderScreen(
+                                      path: found.path,
+                                      title: found.title,
+                                      initialSection:
+                                          h.pageIndex > 0 ? h.pageIndex - 1 : null,
+                                    )
+                                  : PdfReaderScreen(
+                                      path: found.path,
+                                      title: found.title,
+                                      initialPage: h.pageIndex,
+                                    );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+/// تب کارت‌های لایتنر با مرور روزانه بر پایه SM-2.
+class _FlashcardsTab extends ConsumerWidget {
+  const _FlashcardsTab();
+
+  Future<void> _review(BuildContext context, WidgetRef ref) async {
+    final notifier = ref.read(flashcardsProvider.notifier);
+    final due = await notifier.due();
+    if (!context.mounted) return;
+    if (due.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('کارت سررسیدی برای امروز نیست ✓')),
+      );
+      return;
+    }
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+      ),
+      builder: (_) => _ReviewSheet(queue: due),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cards = ref.watch(flashcardsProvider);
+    if (cards.isEmpty) {
+      return const _EmptyHint(
+        icon: Icons.style,
+        title: 'لایتنر خالی است',
+        hint: 'در دیکشنری دکمه «لایتنر» را بزن',
+      );
+    }
+    final dueCount = cards.where((c) => c.isDue).length;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+          child: FilledButton.icon(
+            onPressed: () => _review(context, ref),
+            icon: const Icon(Icons.play_arrow),
+            label: Text(dueCount > 0
+                ? 'مرور امروز ($dueCount کارت)'
+                : 'مرور امروز — کارتی نیست'),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: cards.length,
+            itemBuilder: (c, i) {
+              final f = cards[i];
+              return Dismissible(
+                key: ValueKey('fc-${f.id}'),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: Colors.red.shade700,
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (_) =>
+                    ref.read(flashcardsProvider.notifier).removeEntry(f),
+                child: ListTile(
+                  leading: const Icon(Icons.style, color: Color(0xFF7CB342)),
+                  title: Text(f.word, textDirection: TextDirection.ltr),
+                  subtitle: Text(
+                    f.context.isNotEmpty
+                        ? '${f.meaning} — «${f.context}»'
+                        : f.meaning,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  // وضعیت زمان‌بندی SM-2 روی خود کارت
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (f.isDue)
+                        const Tooltip(
+                          message: 'سررسید',
+                          child: Icon(Icons.schedule,
+                              size: 16, color: Color(0xFFE57373)),
+                        ),
+                      IconButton(
+                        tooltip: 'تلفظ',
+                        icon: const Icon(Icons.volume_up, size: 20),
+                        onPressed: () => DictionaryService.instance.speak(f.word),
+                      ),
+                    ],
+                  ),
+                  onLongPress: () =>
+                      ref.read(flashcardsProvider.notifier).removeEntry(f),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// مرور کارت‌ها: اول معنی پنهان است، بعد از «نمایش پاسخ» کاربر
+/// کیفیت تسلطش را می‌گوید و SM-2 بازه بعدی را حساب می‌کند.
+class _ReviewSheet extends ConsumerStatefulWidget {
+  final List<FlashcardEntry> queue;
+  const _ReviewSheet({required this.queue});
+
+  @override
+  ConsumerState<_ReviewSheet> createState() => _ReviewSheetState();
+}
+
+class _ReviewSheetState extends ConsumerState<_ReviewSheet> {
+  int _i = 0;
+  bool _revealed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final queue = widget.queue;
+    if (_i >= queue.length) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(24, 30, 24, 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.celebration, size: 56),
+            const SizedBox(height: 12),
+            Text('${queue.length} کارت مرور شد',
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 6),
+            Text('بازه مرور بعدی خودکار تنظیم شد',
+                style: Theme.of(context).textTheme.bodySmall),
+            const SizedBox(height: 18),
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('بستن'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final card = queue[_i];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 14, 22, 30),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: Container(
+              width: 44,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade700,
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '${_i + 1} / ${queue.length}',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            card.word,
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.ltr,
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 10),
+          if (_revealed) ...[
+            Text(card.meaning,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 17, height: 1.9)),
+            if (card.context.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text('«${card.context}»',
+                  textAlign: TextAlign.center,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ] else
+            TextButton.icon(
+              onPressed: () => setState(() => _revealed = true),
+              icon: const Icon(Icons.visibility, size: 18),
+              label: const Text('نمایش پاسخ'),
+            ),
+          const SizedBox(height: 20),
+          if (_revealed) ...[
+            Row(
+              children: [
+                for (final grade in const [
+                  (0, 'فراموش'),
+                  (3, 'سخت'),
+                  (4, 'خوب'),
+                  (5, 'آسان'),
+                ]) ...[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      child: OutlinedButton(
+                        onPressed: () => _grade(context, card, grade.$1),
+                        child: Text(grade.$2,
+                            style: const TextStyle(fontSize: 12)),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+          const SizedBox(height: 10),
+          TextButton.icon(
+            onPressed: () => DictionaryService.instance.speak(card.word),
+            icon: const Icon(Icons.volume_up, size: 18),
+            label: const Text('تلفظ'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _grade(
+      BuildContext context, FlashcardEntry card, int quality) async {
+    await ref.read(flashcardsProvider.notifier).review(card, quality);
+    if (!mounted) return;
+    setState(() {
+      _i++;
+      _revealed = false;
+    });
+  }
+}
+
+class _MissingBook extends StatelessWidget {
+  const _MissingBook();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('کتاب یافت نشد')),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text('این کتاب دیگر در کتابخانه نیست',
+              textAlign: TextAlign.center),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyHint extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String hint;
+  const _EmptyHint(
+      {required this.icon, required this.title, required this.hint});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 64, color: Theme.of(context).disabledColor),
+          const SizedBox(height: 12),
+          Text(title),
+          const SizedBox(height: 6),
+          Text(hint, style: Theme.of(context).textTheme.bodySmall),
+        ],
       ),
     );
   }
@@ -620,14 +1055,40 @@ class StatsPage extends ConsumerWidget {
     final highlights = ref.watch(highlightsProvider);
     final cardsList = ref.watch(flashcardsProvider);
     final finished = books.where((b) => b.progress >= 0.99).length;
-    final pagesRead = books.fold<int>(0, (s, b) => s + b.lastPage);
+    final started = books.where((b) => b.progress > 0.01).length;
+    final dueCards = cardsList.where((c) => c.isDue).length;
+    final authors = books
+        .map((b) => b.author?.trim())
+        .where((a) => a != null && a.isNotEmpty)
+        .toSet()
+        .length;
+
+    // تخمین صفحات خوانده‌شده: برای کتاب تمام‌شده کل صفحات،
+    // برای کتاب در جریان همان صفحه‌ای که کاربر روی آن است
+    var pagesRead = 0;
+    for (final b in books) {
+      if (b.progress >= 0.99 && b.totalPages > 0) {
+        pagesRead += b.totalPages;
+      } else if (b.progress > 0.01) {
+        pagesRead += b.lastPage;
+      }
+    }
+
     final cards = [
       {'t': 'کل کتاب‌ها', 'v': '${books.length}', 'i': Icons.library_books},
+      {'t': 'شروع‌شده', 'v': '$started', 'i': Icons.play_circle_outline},
       {'t': 'تمام‌شده', 'v': '$finished', 'i': Icons.check_circle},
+      {'t': 'صفحه خوانده', 'v': '$pagesRead', 'i': Icons.article_outlined},
       {'t': 'نشان‌ها', 'v': '${marks.length}', 'i': Icons.bookmark},
       {'t': 'هایلایت‌ها', 'v': '${highlights.length}', 'i': Icons.highlight_alt},
-      {'t': 'کارت لایتنر', 'v': '${cardsList.length}', 'i': Icons.style},
-      {'t': 'صفحات خوانده', 'v': '$pagesRead', 'i': Icons.article_outlined},
+      {
+        't': 'کارت لایتنر',
+        'v': dueCards > 0
+            ? '${cardsList.length} ($dueCards سررسید)'
+            : '${cardsList.length}',
+        'i': Icons.style
+      },
+      if (authors > 0) {'t': 'نویسنده', 'v': '$authors', 'i': Icons.person},
     ];
     return Scaffold(
       appBar: AppBar(title: const Text('📊 آمار مطالعه')),

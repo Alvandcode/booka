@@ -18,6 +18,7 @@ class LibraryBook {
   final String title;
   final String type; // pdf | epub
   final String? coverPath;
+  final String? author;
 
   /// لنگر دقیق موقعیت: برای EPUB شناسه CFI، برای PDF شماره صفحه
   final String? lastAnchor;
@@ -34,6 +35,7 @@ class LibraryBook {
     required this.type,
     required this.addedAt,
     this.coverPath,
+    this.author,
     this.lastAnchor,
     this.lastPage = 1,
     this.totalPages = 0,
@@ -51,6 +53,7 @@ class LibraryBook {
         type: type,
         addedAt: addedAt,
         coverPath: coverPath,
+        author: author,
         lastAnchor: lastAnchor,
         lastPage: lastPage,
         totalPages: totalPages,
@@ -61,6 +64,7 @@ class LibraryBook {
   LibraryBook copyWith({
     String? title,
     String? coverPath,
+    String? author,
     String? lastAnchor,
     int? lastPage,
     int? totalPages,
@@ -73,6 +77,7 @@ class LibraryBook {
         title: title ?? this.title,
         type: type,
         coverPath: coverPath ?? this.coverPath,
+        author: author ?? this.author,
         lastAnchor: lastAnchor ?? this.lastAnchor,
         lastPage: lastPage ?? this.lastPage,
         totalPages: totalPages ?? this.totalPages,
@@ -87,6 +92,7 @@ class LibraryBook {
         'title': title,
         'type': type,
         'cover_path': coverPath,
+        'author': author,
         'last_anchor': lastAnchor,
         'last_page': lastPage,
         'total_pages': totalPages,
@@ -101,6 +107,7 @@ class LibraryBook {
         title: r['title'] as String? ?? 'بدون عنوان',
         type: r['type'] as String? ?? 'pdf',
         coverPath: r['cover_path'] as String?,
+        author: r['author'] as String?,
         lastAnchor: r['last_anchor'] as String?,
         lastPage: (r['last_page'] as num?)?.toInt() ?? 1,
         totalPages: (r['total_pages'] as num?)?.toInt() ?? 0,

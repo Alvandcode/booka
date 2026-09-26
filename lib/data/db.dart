@@ -8,7 +8,7 @@ class Db {
   const Db._();
 
   static const fileName = 'booka.db';
-  static const schemaVersion = 1;
+  static const schemaVersion = 2;
 
   /// نام جدول‌ها
   static const tBooks = 'books';
@@ -53,6 +53,7 @@ class Db {
         title       TEXT    NOT NULL,
         type        TEXT    NOT NULL,
         cover_path  TEXT,
+        author      TEXT,
         last_anchor TEXT,
         last_page   INTEGER NOT NULL DEFAULT 1,
         total_pages INTEGER NOT NULL DEFAULT 0,
@@ -134,7 +135,10 @@ class Db {
   }
 
   static Future<void> _upgrade(Database db, int from, int to) async {
-    // نسخه ۱ نقطه شروع است؛ شاخه‌های بعدی اینجا اضافه می‌شوند.
+    // نسخه ۱ → ۲: افزودن ستون نویسنده به کتاب‌ها
+    if (from < 2) {
+      await db.execute('ALTER TABLE $tBooks ADD COLUMN author TEXT');
+    }
   }
 
   /// بستن اتصال — فقط برای تست و خروج تمیز از اپ.

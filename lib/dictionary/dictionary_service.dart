@@ -9,7 +9,12 @@ class DictionaryService {
   DictionaryService._();
 
   Map<String, dynamic>? _map;
-  final _tts = FlutterTts();
+
+  /// موتور TTS با نیاز lazily ساخته می‌شود. ساختنش در constructor باعث
+  /// می‌شد استفاده از منطق خالصِ [normalize] هم به کانال پلتفرم وابسته
+  /// شود و در تست واحد بشکند.
+  FlutterTts? _tts;
+  FlutterTts get _speech => _tts ??= FlutterTts();
 
   Future<void> _ensureLoaded() async {
     if (_map != null) return;
@@ -17,12 +22,27 @@ class DictionaryService {
     _map = jsonDecode(raw) as Map<String, dynamic>;
   }
 
+  /// نشانه‌هایی که ممکن است دور واژه باشند — شامل علامت‌های
+  /// عربی و فارسی که در متن کتاب‌ها بسیار رایج‌اند.
+  /// توجه: این الگو فقط روی ابتدا و انتها اعمال می‌شود، نه کل رشده،
+  /// تا نشانه‌های داخلی مثل آپاستروف در don't سالم بمانند.
+  static final _leadingPunctuation =
+      RegExp(r'''^[\s!?,;:"'`(){}\[\]«»،؛؟٪٫…\.\-–—/\\|]+''');
+  static final _trailingPunctuation =
+      RegExp(r'''[\s!?,;:"'`(){}\[\]«»،؛؟٪٫…\.\-–—/\\|]+$''');
+
+  /// یکسان‌سازی واژه برای جستجو: کوچک‌سازی حروف، حذف نشانه‌گذاری
+  /// ابتدا و انتها و فشرده‌سازی فاصله‌های داخلی.
+  ///
+  /// نسخه قبلی فقط یک نشانه از هر طرف را حذف می‌کرد و نشانه‌های
+  /// عربی مثل «،» و «؟» را نمی‌شناخت، بنابراین جستجوی کلمه‌ای که
+  /// در جمله با ویرگول آمده بود شکست می‌خورد.
   String normalize(String s) {
     return s
-        .trim()
         .toLowerCase()
-        .replaceAll(RegExp(r'''[!?,;:"'()\[\]{}«».]$'''), '')
-        .replaceAll(RegExp(r'''^[!?,;:"'()\[\]{}«».]'''), '');
+        .replaceFirst(_leadingPunctuation, '')
+        .replaceFirst(_trailingPunctuation, '')
+        .replaceAll(RegExp(r'\s+'), ' ');
   }
 
   /// معنی‌ها؛ آرایه خالی یعنی پیدا نشد
@@ -50,18 +70,32 @@ class DictionaryService {
     return [];
   }
 
-  /// تلفظ با موتور TTS خود گوشی — آفلاین، حجم صفر
+  /// تلفظ با موتور TTS خود گوشی — آفلاین، حجم صفر.
+  /// خطا اینجا عمداً بی‌صدا رد می‌شود چون نبود موتور TTS نباید
+  /// جریان عادی خواندن را متوقف کند؛ وضعیت در [isSpeechAvailable] دیده می‌شود.
   Future<void> speak(String text, {String lang = 'en-US'}) async {
     try {
-      await _tts.setLanguage(lang);
-      await _tts.setSpeechRate(0.45);
-      await _tts.speak(text);
+      final tts = _speech;
+      await tts.setLanguage(lang);
+      await tts.setSpeechRate(0.45);
+      await tts.speak(text);
     } catch (_) {}
+  }
+
+  /// آیا موتور تلفظ روی این دستگاه در دسترس است؟
+  /// برای پنهان کردن دکمه تلفظ وقتی هیچ موتوری نصب نیست.
+  Future<bool> isSpeechAvailable() async {
+    try {
+      final engines = await _speech.getEngines;
+      return engines is List && engines.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<void> stop() async {
     try {
-      await _tts.stop();
+      await _speech.stop();
     } catch (_) {}
   }
 }
