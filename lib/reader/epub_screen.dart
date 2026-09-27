@@ -1,14 +1,27 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:epubx/epubx.dart';
+// فقط EpubReader لازم است؛ کلاس Image این پکیج با Image فلاتر تداخل دارد
+import 'package:epubx/epubx.dart' show EpubReader;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '../data/store.dart';
 import '../dictionary/dictionary_sheet.dart';
 import 'epub_document.dart';
 import 'epub_text.dart';
+
+/// حذف نور کشیدن انگشت (overscroll glow) هنگام خواندن
+class _NoGlowBehavior extends ScrollBehavior {
+  const _NoGlowBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+          BuildContext context, Widget child, ScrollableDetails details) =>
+      child;
+}
 
 /// ریدر EPUB — تایپوگرافی فارسی، فهرست مطالب و جستجوی درون‌کتاب.
 ///
@@ -42,8 +55,10 @@ class _EpubReaderScreenState extends ConsumerState<EpubReaderScreen> {
   int _section = 0;
   String _selectedText = '';
 
+  /// رندر کامل HTML با تصاویر و قالب‌بندی
+  bool _richText = true;
+
   final _scroll = ScrollController();
-  final _searchCtrl = TextEditingController();
 
   double get _fontSize => ref.watch(readerFontSizeProvider);
 
@@ -60,7 +75,6 @@ class _EpubReaderScreenState extends ConsumerState<EpubReaderScreen> {
   @override
   void dispose() {
     _scroll.dispose();
-    _searchCtrl.dispose();
     super.dispose();
   }
 
@@ -384,6 +398,114 @@ class _EpubReaderScreenState extends ConsumerState<EpubReaderScreen> {
     ctrl.dispose();
   }
 
+  /// حالت ساده: فقط متن خالص، سریع و همیشه قابل انتخاب
+  Widget _buildPlain() {
+    return SingleChildScrollView(
+      controller: _scroll,
+      padding: const EdgeInsets.fromLTRB(22, 12, 22, 16),
+      child: SelectableText(
+        _currentText,
+        style: TextStyle(fontSize: _fontSize, height: 2.2),
+        textAlign: TextAlign.justify,
+        onSelectionChanged: (sel, cause) {
+          final txt =
+              sel.isValid && !sel.isCollapsed ? sel.textInside(_currentText) : '';
+          if (txt != _selectedText) setState(() => _selectedText = txt);
+        },
+      ),
+    );
+  }
+
+  /// حالت کامل: HTML واقعی با تصویر، جدول، بولد و قالب‌بندی کتاب.
+  ///
+  /// متن انتخاب‌شده از خود رندرکننده گرفته می‌شود، نه از متن خالص، تا
+  /// اگر کاربر روی متنی که در استخراج ساده نبوده کلیک کند باز هم کار کند.
+  Widget _buildRich() {
+    final doc = _doc;
+    if (doc == null) return const SizedBox.shrink();
+    final html = doc.renderableHtml(_section);
+
+    if (html.trim().isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Text(
+            'این بخش محتوایی برای نمایش ندارد',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+      );
+    }
+
+    return ScrollConfiguration(
+      behavior: const _NoGlowBehavior(),
+      child: SelectionArea(
+        onSelectionChanged: (sel) {
+          final txt = sel?.plainText ?? '';
+          if (txt.trim() != _selectedText.trim()) {
+            setState(() => _selectedText = txt);
+          }
+        },
+        child: SingleChildScrollView(
+          controller: _scroll,
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
+          child: HtmlWidget(
+            html,
+            // رندر تنبل برای کتاب‌های سنگین
+            renderMode: RenderMode.listView,
+            enableCaching: true,
+            // قالب‌بندی کتاب نباید فونت و رنگ تم فلاتر را بازنویسی کند
+            textStyle: TextStyle(
+              fontSize: _fontSize,
+              height: 2.0,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            rebuildTriggers: [
+              _section,
+              _richText,
+              _fontSize,
+              Theme.of(context).brightness,
+            ],
+            onErrorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            onTapImage: (meta) {
+              // تصویرها داخل کتاب هستند و مسیر شبکه ندارند
+              final url =
+                  meta.sources.isNotEmpty ? meta.sources.first.url : null;
+              if (url != null && url.startsWith('data:')) _showImage(url);
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showImage(String dataUri) {
+    final bytes = _decodeDataUri(dataUri);
+    if (bytes == null) return;
+    showDialog<void>(
+      context: context,
+      builder: (c) => Dialog(
+        insetPadding: const EdgeInsets.all(16),
+        child: InteractiveViewer(
+          maxScale: 5,
+          child: Image.memory(bytes, fit: BoxFit.contain),
+        ),
+      ),
+    );
+  }
+
+  static Uint8List? _decodeDataUri(String uri) {
+    try {
+      final comma = uri.indexOf(',');
+      if (comma == -1) return null;
+      if (!uri.substring(0, comma).contains('base64')) return null;
+      return base64Decode(uri.substring(comma + 1));
+    } catch (_) {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final doc = _doc;
@@ -423,6 +545,14 @@ class _EpubReaderScreenState extends ConsumerState<EpubReaderScreen> {
             tooltip: 'نشان‌گذاری',
             icon: const Icon(Icons.bookmark_add_outlined),
             onPressed: _addBookmark,
+          ),
+          IconButton(
+            tooltip: _richText ? 'نمایش ساده متن' : 'نمایش کامل قالب‌بندی',
+            icon: Icon(_richText ? Icons.notes : Icons.article_outlined),
+            onPressed: () {
+              setState(() => _richText = !_richText);
+              if (_scroll.hasClients) _scroll.jumpTo(0);
+            },
           ),
         ],
         bottom: PreferredSize(
@@ -464,23 +594,7 @@ class _EpubReaderScreenState extends ConsumerState<EpubReaderScreen> {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              controller: _scroll,
-              padding: const EdgeInsets.fromLTRB(22, 12, 22, 16),
-              child: SelectableText(
-                _currentText,
-                style: TextStyle(fontSize: _fontSize, height: 2.2),
-                textAlign: TextAlign.justify,
-                onSelectionChanged: (sel, cause) {
-                  final txt = sel.isValid && !sel.isCollapsed
-                      ? sel.textInside(_currentText)
-                      : '';
-                  if (txt != _selectedText) {
-                    setState(() => _selectedText = txt);
-                  }
-                },
-              ),
-            ),
+            child: _richText ? _buildRich() : _buildPlain(),
           ),
           if (_selectedText.trim().isNotEmpty)
             Material(

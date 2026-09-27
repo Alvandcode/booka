@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:epubx/epubx.dart';
 
+import 'epub_html.dart';
+
 /// یک بخش قابل خواندن از کتاب (معمولاً یک فصل).
 class EpubSection {
   final int index;
@@ -13,7 +15,11 @@ class EpubSection {
   /// عنوان بخش، اگر از فهرست مطالب قابل تشخیص باشد
   final String? title;
 
-  const EpubSection({
+  /// HTML آماده رندر، در اولین استفاده ساخته و نگه داشته می‌شود تا
+  /// تزریق تصاویر برای هر بار رندر تکرار نشود.
+  String? rendered;
+
+  EpubSection({
     required this.index,
     required this.href,
     required this.html,
@@ -62,13 +68,30 @@ class EpubDocument {
 
   final Uint8List? coverBytes;
 
+  /// نقشه مسیر → بایت تصویر، برای inline کردن تصاویر هنگام رندر
+  final Map<String, List<int>> images;
+
+  /// CSS های داخل کتاب، ادغام‌شده
+  final String css;
+
   const EpubDocument({
     required this.sections,
     required this.toc,
     this.title,
     this.author,
     this.coverBytes,
+    this.images = const {},
+    this.css = '',
   });
+
+  /// HTML آماده رندر یک بخش — تصاویر و CSS در آن تزریق شده‌اند.
+  /// نتیجه کش می‌شود چون رندر هر بار از همان HTML استفاده می‌کند.
+  String renderableHtml(int index) {
+    final s = sectionAt(index);
+    if (s == null) return '';
+    return s.rendered ??=
+        EpubHtml.renderable(s.html, images: images, css: css);
+  }
 
   bool get isEmpty => sections.isEmpty;
   int get length => sections.length;
@@ -196,6 +219,8 @@ class EpubDocument {
       sections: titled,
       toc: effectiveToc,
       coverBytes: _coverBytes(book),
+      images: EpubHtml.imageMap(book),
+      css: EpubHtml.combinedCss(book),
     );
   }
 
