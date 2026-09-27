@@ -66,56 +66,67 @@ $env:PUB_HOSTED_URL = "https://pub.flutter-io.cn"
 
 ## انتشار اندروید
 
-### ۱. ساخت کلید امضا (فقط یک‌بار)
+اپ در فروشگاه نیست. خروجی با امضای مستقیم در صفحه Releases همین ریپو
+منتشر می‌شود. راهنمای نصب برای کاربران در
+[docs/INSTALL.fa.md](docs/INSTALL.fa.md) است.
 
-> اگر کلید را گم کنی دیگر نمی‌توانی نسخه به‌روزشده‌ای روی فروشگاه
-> منتشر کنی. حتماً یک نسخه پشتیبان امن نگه دار.
+### کلید امضا
 
-```bash
-keytool -genkey -v -keystore ~/booka-release.jks \
-        -keyalg RSA -keysize 2048 -validity 10000 -alias booka
-```
+کلید از قبل ساخته شده و **یک بار برای همیشه** استفاده می‌شود. همین
+نکته باعث می‌شود نسخه جدید روی نسخه قبلی نصب شود و کاربر مجبور به
+حذف و نصب دوباره نشود.
 
-### ۲. تنظیم کلید
+| | |
+|---|---|
+| محل کلید | `~/.booka/booka-release.jks` (خارج از ریپو) |
+| اطلاعات و رمز | `~/.booka/credentials.txt` |
+| اعتبار گواهی | تا سال ۲۰۵۴ |
+| الگوریتم | RSA 4096 / SHA256withRSA |
 
-```bash
-cp android/key.properties.example android/key.properties
-```
+> **این کلید را گم نکن.** اگر کلید یا رمزش را از دست بدهی، دیگر
+> نمی‌توانی نسخه‌ای منتشر کنی که روی نصب‌های موجود کاربران نصب شود؛
+> مجبور می‌شوی `applicationId` را عوض کنی و اپ را از نو منتشر کنی. از
+> هر دو فایل پشتیبان بگیر و در جای امن نگه دار.
 
-مقادیر داخل `android/key.properties` را پر کن:
-
-```properties
-storePassword=...
-keyPassword=...
-keyAlias=booka
-storeFile=/مسیر/مطلق/تا/booka-release.jks
-```
-
-`android/key.properties` و فایل‌های `*.jks` در git نیستند.
-
-### ۳. بالا بردن شماره نسخه
-
-در `pubspec.yaml`:
-
-```yaml
-version: 0.2.0+2
-```
-
-همین نسخه را در `lib/app_info.dart` هم به‌روز کن تا داخل اپ درست
-نمایش داده شود.
-
-### ۴. ساخت
+### انتشار محلی
 
 ```bash
-flutter build appbundle --release   # برای فروشگاه Play
-flutter build apk --release         # برای نصب مستقیم
+flutter build apk --release --split-per-abi
+flutter build appbundle --release
 ```
 
-اگر `key.properties` نباشد، بیلد با کلید debug انجام می‌شود و یک هشدار
-واضح چاپ می‌شود. چنین خروجی‌ای در فروشگاه قابل انتشار نیست.
+`android/key.properties` به کلید اشاره می‌کند و در git نیست. اگر نبود،
+بیلد با کلید debug انجام می‌شود و هشدار چاپ می‌کند که خروجی قابل
+انتشار نیست.
 
-بیلد release کد و منابع را با R8 کوچک می‌کند و خروجی به تفکیک معماری
-(armeabi-v7a، arm64-v8a، x86_64) به‌علاوه یک APK یکپارچه ساخته می‌شود.
+### انتشار خودکار
+
+`.github/workflows/release.yml` با زدن تگ بیلد می‌گیرد، تست می‌کند،
+با کلید واقعی امضا می‌کند و در صفحه Releases قرار می‌دهد.
+
+```bash
+# در pubspec.yaml نسخه را بالا ببر، مثلاً version: 0.2.0+2
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+برای اینکه CI بتواند امضا کند، یک‌بار این secretها را در
+`Settings → Secrets and variables → Actions` اضافه کن:
+
+| نام | مقدار |
+|---|---|
+| `BOOKA_KEYSTORE_BASE64` | خروجی `base64 -w0 ~/.booka/booka-release.jks` |
+| `BOOKA_STORE_PASSWORD` | رمز انبار کلید |
+| `BOOKA_KEY_PASSWORD` | رمز کلید |
+| `BOOKA_KEY_ALIAS` | `booka` |
+
+اگر این secretها تنظیم نشده باشند، بیلد با پیام روشن متوقف می‌شود تا
+نسخه‌ای با امضای اشتباه منتشر نشود.
+
+### بالا بردن نسخه
+
+نسخه را در `pubspec.yaml` عوض کن و همان را در `lib/app_info.dart`
+به‌روز کن تا داخل اپ هم درست نمایش داده شود.
 
 ## انتشار iOS
 
@@ -134,8 +145,17 @@ flutter build ipa --release
 نسخه وب هنوز کامل نیست: کد ریدر از `dart:io` استفاده می‌کند و `pdfx`
 پشتیبانی وب ندارد، پس `flutter build web` فعلاً کامپایل نمی‌شود.
 
+## وضعیت زنجیره ابزار
+
+این پروژه روی Flutter 3.24.5 و AGP 8.1.0 ساخته شده که نسبت به نسخه‌های
+روز مرداد ۱۴۰۵ قدیمی‌اند. `compileSdk = 36` رسماً توسط AGP 8.1
+پشتیبانی نمی‌شود و با `android.suppressUnsupportedCompileSdk` در
+gradle.properties ساکت خاموش شده. پیش از انتشار گسترده، ارتقای Flutter
+و AGP توصیه می‌شود.
+
 ## مجوز
 
-- کد: پروژه شخصی
+- کد: MIT (متن کامل در [LICENSE](LICENSE))
 - فونت Vazirmatn: SIL Open Font License 1.1 (متن کامل در
   `assets/fonts/OFL.txt`)
+

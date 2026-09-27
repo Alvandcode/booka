@@ -1,0 +1,103 @@
+name: Release
+
+# با زدن یک تگ (مثلاً v0.2.0) بیلد release گرفته می‌شود، امضا می‌شود
+# و در صفحه Releases همان ریپو قرار می‌گیرد.
+#
+# راه‌اندازی یک‌بار:
+#   Settings → Secrets and variables → Actions → New repository secret
+#   BOOKA_KEYSTORE_BASE64  محتوای فایل .jks به‌صورت base64
+#   BOOKA_STORE_PASSWORD  رمز انبار کلید
+#   BOOKA_KEY_PASSWORD    رمز کلید
+#   BOOKA_KEY_ALIAS       نام مستعار (booka)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'برچسب نسخه، مثلاً v0.2.0'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build signed APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.24.5'
+          cache: true
+
+      - name: بازیابی کلید امضا
+        id: keystore
+        # اگر secret تنظیم نشده باشد، اینجا متوقف می‌شویم تا نسخه‌ای
+        # که با کلید اشتباه امضا شده منتشر نشود
+        env:
+          KEYSTORE_B64: ${{ secrets.BOOKA_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.BOOKA_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.BOOKA_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.BOOKA_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          if [ -z "$KEYSTORE_B64" ] || [ -z "$STORE_PASSWORD" ]; then
+            echo "::error::کلید امضا تنظیم نشده. راهنمای README بخش «انتشار» را ببین."
+            exit 1
+          fi
+          echo "$KEYSTORE_B64" | base64 --decode > android/booka-release.jks
+          cat > android/key.properties <<EOF
+          storePassword=$STORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=${KEY_ALIAS:-booka}
+          storeFile=$GITHUB_WORKSPACE/android/booka-release.jks
+          EOF
+          echo "کلید امضا آماده شد."
+
+      - name: بازیابی وابستگی‌ها
+        run: flutter pub get
+
+      - name: تحلیل ایستا
+        run: flutter analyze --no-fatal-infos
+
+      - name: تست
+        run: flutter test
+
+      - name: ساخت APK
+        run: flutter build apk --release --split-per-abi
+
+      - name: ساخت App Bundle برای فروشگاه
+        run: flutter build appbundle --release
+
+      - name: انتشار در صفحه Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/*.apk dist/ || true
+          cp build/app/outputs/bundle/release/*.aab dist/ || true
+          sha256sum dist/* > dist/checksums.txt || true
+          gh release create "$TAG" dist/* \
+            --title "Booka $TAG" \
+            --generate-notes \
+            || gh release upload "$TAG" dist/* --clobber
+          echo "منتشر شد: $TAG"
+
+      - name: پاکسازی کلید
+        if: always()
+        run: rm -f android/booka-release.jks android/key.properties
