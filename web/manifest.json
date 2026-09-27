@@ -1,12 +1,14 @@
 {
-    "name": "book_reader_app",
-    "short_name": "book_reader_app",
+    "name": "Booka — کتابخوان آفلاین",
+    "short_name": "Booka",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#14121F",
+    "theme_color": "#14121F",
+    "description": "کتابخوان آفلاین PDF و EPUB با دیکشنری انگلیسی-فارسی و مرور واژگان.",
+    "lang": "fa",
+    "dir": "rtl",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

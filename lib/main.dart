@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'about_page.dart';
+import 'app_info.dart';
 import 'data/store.dart';
 import 'dictionary/dictionary_service.dart';
 import 'export_page.dart';
@@ -45,7 +46,7 @@ class BookReaderApp extends ConsumerWidget {
         theme = PaperGlassTheme.amoled();
     }
     return MaterialApp(
-      title: 'Booka',
+      title: AppInfo.name,
       debugShowCheckedModeBanner: false,
       locale: const Locale('fa'),
       supportedLocales: const [Locale('fa'), Locale('en')],
@@ -1202,10 +1203,10 @@ class SettingsPage extends ConsumerWidget {
               MaterialPageRoute(builder: (_) => const AboutPage()),
             ),
           ),
-          const ListTile(
-            leading: Icon(Icons.menu_book),
-            title: Text('Booka'),
-            subtitle: Text('نسخه ۰٫۱٫۰ — Paper & Glass'),
+          ListTile(
+            leading: const Icon(Icons.menu_book),
+            title: const Text(AppInfo.name),
+            subtitle: Text('${AppInfo.tagline} — ${AppInfo.fullVersion}'),
           ),
         ],
       ),

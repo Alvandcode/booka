@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id "com.android.application"
     id "kotlin-android"
@@ -5,10 +7,26 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+// ── کلید امضا ──
+// کلید انتشار از android/key.properties خوانده می‌شود که در git نیست.
+// اگر نبود، بیلد با کلید debug انجام می‌شود ولی هشدار واضح چاپ می‌شود، چون
+// چنین بیلدی در فروشگاه قابل انتشار نیست و می‌تواند جایگزین شود.
+def keystorePropertiesFile = rootProject.file("key.properties")
+def keystoreProperties = new Properties()
+def hasReleaseKey = false
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+    hasReleaseKey = ["storeFile", "storePassword", "keyAlias", "keyPassword"]
+            .every { keystoreProperties.containsKey(it) }
+}
+
 android {
     lint {
-        checkReleaseBuilds false
-        abortOnError false
+        // lint باید شکست بیلد بدهد، نه اینکه بی‌سروصدا رد شود
+        checkReleaseBuilds true
+        abortOnError true
+        // مسائل بی‌اهمیت ظاهری نباید جلوی انتشار را بگیرند
+        disable 'OldTargetApi', 'GradleDependency', 'MissingTranslation'
     }
     namespace = "com.bookreader.book_reader_app"
     compileSdk = 36
@@ -16,30 +34,68 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_11
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.bookreader.book_reader_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // فارسی در برخی دستگاه‌ها بدون این می‌تواند اعداد را لاتین نشان دهد
+        resourceConfigurations += ["fa", "en"]
+    }
+
+    signingConfigs {
+        if (hasReleaseKey) {
+            release {
+                storeFile = rootProject.file(keystoreProperties["storeFile"])
+                storePassword = keystoreProperties["storePassword"]
+                keyAlias = keystoreProperties["keyAlias"]
+                keyPassword = keystoreProperties["keyPassword"]
+            }
+        }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            signingConfig = hasReleaseKey
+                    ? signingConfigs.release
+                    : signingConfigs.debug
+
+            // کوچک‌سازی و حذف منابع بلااستفاده
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+
+            if (!hasReleaseKey) {
+                logger.warn(
+                        "\n" +
+                        "╔══════════════════════════════════════════════════════════╗\n" +
+                        "║  کلید امضای انتشار پیدا نشد (android/key.properties)      ║\n" +
+                        "║  این بیلد با کلید debug امضا می‌شود و در فروشگاه          ║\n" +
+                        "║  قابل انتشار نیست. برای ساخت نسخه نهایی، بخش             ║\n" +
+                        "║  «انتشار» در README.md را دنبال کن.                       ║\n" +
+                        "╚══════════════════════════════════════════════════════════╝\n")
+            }
+        }
+    }
+
+    // در بیلدهای release چند ABI همزمان ساخته می‌شوند. تقسیم ABI حجم
+    // نصبی هر کاربر را کم می‌کند چون فقط معماری دستگاهش دانلود می‌شود.
+    splits {
+        abi {
+            enable true
+            reset()
+            include "armeabi-v7a", "arm64-v8a", "x86_64"
+            universalApk true
         }
     }
 }

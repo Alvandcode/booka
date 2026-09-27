@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'app_info.dart';
 import 'privacy_page.dart';
 
 // صفحه «درباره ما» — سازنده، حمایت، لینک‌ها
@@ -42,11 +43,11 @@ class AboutPage extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Center(
-            child: Text('Booka',
+            child: Text(AppInfo.name,
                 style: Theme.of(context).textTheme.titleLarge),
           ),
           Center(
-            child: Text('Paper & Glass — نسخه ۰٫۱٫۰',
+            child: Text('${AppInfo.tagline} — ${AppInfo.fullVersion}',
                 style: Theme.of(context).textTheme.bodySmall),
           ),
           const SizedBox(height: 24),
