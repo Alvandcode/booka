@@ -89,6 +89,18 @@ class Dao {
         });
       });
 
+  /// پاک کردن کامل داده‌های محتوایی.
+  ///
+  /// فایل خودِ کتاب‌ها روی دیسک دست‌نخورده می‌ماند؛ فقط رکوردهای
+  /// پایگاه داده حذف می‌شوند تا کاربر بتواند دوباره واردشان کند.
+  /// ترتیب حذف مهم است چون قید کلید خارجی فعال است.
+  Future<void> clearAllContent() => _run((db) => db.transaction((txn) async {
+        await txn.delete(Db.tBookmarks);
+        await txn.delete(Db.tHighlights);
+        await txn.delete(Db.tFlashcards);
+        await txn.delete(Db.tBooks);
+      }));
+
   // ── نشان‌ها ──
 
   Future<List<BookmarkEntry>> bookmarks() => _run((db) async {

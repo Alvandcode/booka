@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'about_page.dart';
 import 'data/store.dart';
 import 'dictionary/dictionary_service.dart';
+import 'export_page.dart';
 import 'privacy_page.dart';
 import 'reader/epub_document.dart';
 import 'reader/epub_screen.dart';
@@ -1171,6 +1172,16 @@ class SettingsPage extends ConsumerWidget {
             trailing: Text(fs.toStringAsFixed(0)),
           ),
           const Divider(),
+          ListTile(
+            leading: const Icon(Icons.save_outlined),
+            title: const Text('بکاپ و خروجی داده'),
+            subtitle: const Text('بکاپ کامل، یا خروجی هایلایت و واژگان'),
+            trailing: const Icon(Icons.chevron_left),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ExportPage()),
+            ),
+          ),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
             title: const Text('حریم خصوصی'),
