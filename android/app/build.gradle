@@ -29,6 +29,14 @@ android {
         disable 'OldTargetApi', 'GradleDependency', 'MissingTranslation'
     }
     namespace = "com.bookreader.book_reader_app"
+    // مقدار پایین‌تر از ۳۶ بیلد را می‌شکند: پلاگین‌های فعال خودشان
+    // compileSdk بالاتر اعلام می‌کنند — flutter_tts روی ۳۶ و
+    // pdfx و flutter_plugin_android_lifecycle روی ۳۵.
+    //
+    // نسخه ۳۶ رسماً توسط AGP 8.1 پشتیبانی نمی‌شود و اخطارش با
+    // android.suppressUnsupportedCompileSdk در gradle.properties خاموش
+    // می‌شود. راه درست، ارتقای زنجیره ابزار (Flutter و AGP) است؛ تا آن
+    // زمان همین مقدار کار می‌کند.
     compileSdk = 36
     buildToolsVersion = "36.0.0"
     ndkVersion = flutter.ndkVersion
