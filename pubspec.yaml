@@ -18,7 +18,7 @@ dependencies:
   epubx: ^4.0.0
   flutter_riverpod: ^2.5.1
   flutter_tts: ^4.0.2
-  file_picker: ^8.0.0
+  file_picker: ^13.1.0
   html: ^0.15.4
   meta: ^1.15.0
   path: ^1.9.0

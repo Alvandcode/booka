@@ -46,17 +46,18 @@ class _ExportPageState extends ConsumerState<ExportPage> {
   }) {
     return _run(() async {
       final bytes = build();
-      final path = await FilePicker.platform.saveFile(
+      final uri = await FilePicker.saveFile(
         dialogTitle: 'ذخیره فایل',
         fileName: suggestedName,
         type: FileType.custom,
         allowedExtensions: extensions,
-        bytes: Uint8List.fromList(bytes),
       );
-      if (path == null) return;
+      if (uri == null) return;
+      final path = uri.toFilePath();
       // روی دسکتاپ و برخی پلتفرم‌ها باید خودمان هم بنویسیم
-      if (!File(path).existsSync()) {
-        await File(path).writeAsBytes(bytes, flush: true);
+      final file = File(path);
+      if (!file.existsSync()) {
+        await file.writeAsBytes(bytes, flush: true);
       }
       _toast('ذخیره شد');
     });
@@ -118,21 +119,20 @@ class _ExportPageState extends ConsumerState<ExportPage> {
 
   Future<void> _importBackup({required bool replace}) async {
     await _run(() async {
-      final res = await FilePicker.platform.pickFiles(
+      final res = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
-      final picked = res?.files.singleOrNull;
+      final picked = res;
       if (picked == null) {
         _toast('فایلی انتخاب نشد');
         return;
       }
       // برخی پلتفرم‌ها فقط مسیر، برخی فقط بایت می‌دهند
-      final raw = picked.path != null && File(picked.path!).existsSync()
-          ? await File(picked.path!).readAsString()
-          : (picked.bytes != null
-              ? utf8.decode(picked.bytes!)
-              : null);
+      final path = picked.path;
+      final raw = path != null && File(path).existsSync()
+          ? await File(path).readAsString()
+          : (picked.bytes != null ? utf8.decode(picked.bytes!) : null);
       if (raw == null) {
         _toast('فایل خوانده نشد', error: true);
         return;

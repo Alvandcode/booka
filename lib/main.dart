@@ -116,11 +116,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     if (_importing) return;
     setState(() => _importing = true);
     try {
-      final res = await FilePicker.platform.pickFiles(
+      final res = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'epub'],
       );
-      final picked = res?.files.singleOrNull;
+      final picked = res;
       final src = picked?.path;
       if (picked == null || src == null || !File(src).existsSync()) return;
 

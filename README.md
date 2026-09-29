@@ -147,11 +147,68 @@ flutter build ipa --release
 
 ## وضعیت زنجیره ابزار
 
-این پروژه روی Flutter 3.24.5 و AGP 8.1.0 ساخته شده که نسبت به نسخه‌های
-روز مرداد ۱۴۰۵ قدیمی‌اند. `compileSdk = 36` رسماً توسط AGP 8.1
-پشتیبانی نمی‌شود و با `android.suppressUnsupportedCompileSdk` در
-gradle.properties ساکت خاموش شده. پیش از انتشار گسترده، ارتقای Flutter
-و AGP توصیه می‌شود.
+| مؤلفه | نسخه | چرا |
+|---|---|---|
+| Flutter | 3.47.5 | نسخه پایدار فعلی |
+| Gradle | 9.4.1 | حداقلی که AGP 9.2 می‌خواهد |
+| AGP | 9.2.0 | سقف پشتیبانی‌شده در Flutter 3.47 |
+| Kotlin | 2.4.0 | نسخه‌ای که Flutter پیشنهاد می‌کند |
+| JDK | 17 | |
+| NDK | 25.2.9519653 | نسخه نصب‌شده روی این ماشین |
+
+### دو نکته که ممکن است تعجب‌آور باشند
+
+**NDK روی ۲۵.۲ ثابت شده، نه ۲۸.۲.** فلاتر پیشنهاد می‌دهد
+`28.2.13676358`، ولی دانلود آن از `dl.google.com` روی این شبکه
+ناموفق است. برای کامپایل بومی پلاگین‌ها ۲۵.۲ کافی است. اگر روزی
+لازم شد، فقط مقدار `ndkVersion` را در `android/app/build.gradle`
+تغییر بده.
+
+**`file_picker` به نسخه ۱۳ ارتقا کرد.** نسخه ۸ در buildscript خودش
+`com.android.tools.build:gradle:7.4.2` اعلام می‌کرد که با Gradle 9
+سازگار نیست. نسخه ۱۳ این مشکل را ندارد، ولی API عوض شده بود
+(`FilePicker.platform.pickFiles` → `FilePicker.pickFiles`) و در
+`lib/main.dart` و `lib/export_page.dart` به‌روزرسانی شد.
+
+### آینه‌های مخزن
+
+`dl.google.com` روی این ماشین کند و گاهی ناموفق است. فایل
+`~/.gradle/init.d/00-mirrors-only.gradle` آینه‌های لازم را اضافه
+می‌کند. این فایل **هیچ نسخه‌ای را قفل نمی‌کند**، فقط مخازن را عوض
+می‌کند.
+
+اگر این فایل را نداشتی، بسازش:
+
+```groovy
+settingsEvaluated { settings ->
+    settings.pluginManagement {
+        repositories {
+            maven { url 'https://maven.aliyun.com/repository/central' }
+            maven { url 'https://maven.aliyun.com/repository/google' }
+            maven { url 'https://maven.aliyun.com/repository/public' }
+            maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+            google()
+            mavenCentral()
+            gradlePluginPortal()
+        }
+    }
+}
+
+allprojects {
+    buildscript {
+        repositories {
+            maven { url 'https://maven.aliyun.com/repository/central' }
+            maven { url 'https://maven.aliyun.com/repository/google' }
+            maven { url 'https://maven.aliyun.com/repository/public' }
+            google()
+            mavenCentral()
+        }
+    }
+}
+```
+
+> بلوک `dependencyResolutionManagement` در `settings.gradle` عمداً
+> وجود ندارد؛ با مخازنی که init script اضافه می‌کند تضاد پیدا می‌کند.
 
 ## مجوز
 

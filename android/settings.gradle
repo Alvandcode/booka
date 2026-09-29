@@ -10,7 +10,6 @@ pluginManagement {
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
-        maven { url 'file:///' + System.getProperty('user.home') + '/.gradle/local-maven' }
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/public' }
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
@@ -22,19 +21,22 @@ pluginManagement {
 
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-    id "com.android.application" version "8.1.0" apply false
-    id "org.jetbrains.kotlin.android" version "1.8.22" apply false
+    // نسخه‌های هماهنگ با Flutter 3.47.5:
+    // Gradle 9.4.1 / AGP 9.2.0 / Kotlin 2.4.0
+    //
+    // Gradle 9.4.1 لازم است چون AGP 9.2 حداقل همین نسخه را می‌خواهد.
+    // Kotlin 2.x لازم است چون flutter_tts کتابخانه kotlin-stdlib 2.2
+    // می‌آورد و کامپایلر 1.8 نمی‌توانست متادیتای آن را بخواند.
+    id "com.android.application" version "9.2.0" apply false
+    id "org.jetbrains.kotlin.android" version "2.4.0" apply false
 }
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
-    repositories {
-        maven { url 'file:///' + System.getProperty('user.home') + '/.gradle/local-maven' }
-        maven { url 'https://maven.aliyun.com/repository/google' }
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        google()
-        mavenCentral()
-    }
-}
+
+// بلوک dependencyResolutionManagement حذف شده.
+//
+// وقتی تنظیم می‌شد، مخازن پروژه را از تنظیمات جدا می‌کرد و با مخازنی که
+// init script سراسری اضافه می‌کند تضاد پیدا می‌کرد. مخازن اصلی در
+// android/build.gradle تعریف شده‌اند و کافی هستند.
 
 include ":app"
+
