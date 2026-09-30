@@ -60,7 +60,13 @@ android {
     signingConfigs {
         if (hasReleaseKey) {
             release {
-                storeFile = rootProject.file(keystoreProperties["storeFile"])
+                // مسیر کلید می‌تواند مطلق یا نسبی باشد. مسیرهای مطلق
+                // ویندوز (C:\...) در Groovy به‌درستی تفسیر نمی‌شوند،
+                // پس با URI به File تبدیل می‌شود.
+                def storePath = keystoreProperties["storeFile"]
+                storeFile = storePath.contains("://") || storePath.startsWith("/")
+                        ? new File(new URI(storePath))
+                        : rootProject.file(storePath)
                 storePassword = keystoreProperties["storePassword"]
                 keyAlias = keystoreProperties["keyAlias"]
                 keyPassword = keystoreProperties["keyPassword"]

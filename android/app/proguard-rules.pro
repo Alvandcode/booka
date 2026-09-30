@@ -30,7 +30,13 @@
 -keep class com.tundralabs.darttts.** { *; }
 
 # ── هشدارها ──
-# R8 درباره این‌ها هشدار می‌دهد ولی برای اپ بی‌ضررند
+# موتور فلاتر به کلاس‌های Play Core ارجاع می‌دهد (PlayStoreDeferredComponentManager)
+# ولی این اپ از deferred components استفاده نمی‌کند، پس کتابخانه مربوطه
+# اضافه نمی‌شود و R8 شکست می‌خورد. این خطوط جلوی خطا را می‌گیرد.
+-dontwarn com.google.android.play.core.**
+-dontwarn io.flutter.embedding.engine.deferredcomponents.**
+-dontwarn io.flutter.embedding.engine.deferredcomponents.**
+
 -dontwarn java.lang.invoke.**
 -dontwarn javax.annotation.**
 -dontwarn sun.misc.**

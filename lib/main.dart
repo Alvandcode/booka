@@ -120,9 +120,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         type: FileType.custom,
         allowedExtensions: ['pdf', 'epub'],
       );
-      final picked = res;
-      final src = picked?.path;
-      if (picked == null || src == null || !File(src).existsSync()) return;
+      // pickFiles در نسخه ۱۳ یک لیست برمی‌گرداند
+      final picked = res?.firstOrNull;
+      final src = picked?.path;      if (picked == null || src == null || !File(src).existsSync()) return;
 
       final ext = picked.extension?.toLowerCase() ?? '';
       final type = ext == 'epub' ? 'epub' : 'pdf';

@@ -46,19 +46,16 @@ class _ExportPageState extends ConsumerState<ExportPage> {
   }) {
     return _run(() async {
       final bytes = build();
+      // در file_picker ۱۳ پارامتر bytes اجباری است و خودش فایل را
+      // در مسیر انتخابی می‌نویسد
       final uri = await FilePicker.saveFile(
         dialogTitle: 'ذخیره فایل',
         fileName: suggestedName,
         type: FileType.custom,
         allowedExtensions: extensions,
+        bytes: Uint8List.fromList(bytes),
       );
       if (uri == null) return;
-      final path = uri.toFilePath();
-      // روی دسکتاپ و برخی پلتفرم‌ها باید خودمان هم بنویسیم
-      final file = File(path);
-      if (!file.existsSync()) {
-        await file.writeAsBytes(bytes, flush: true);
-      }
       _toast('ذخیره شد');
     });
   }
@@ -123,17 +120,22 @@ class _ExportPageState extends ConsumerState<ExportPage> {
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
-      final picked = res;
+      // pickFiles در نسخه ۱۳ یک لیست برمی‌گرداند
+      final picked = res?.firstOrNull;
       if (picked == null) {
         _toast('فایلی انتخاب نشد');
         return;
       }
-      // برخی پلتفرم‌ها فقط مسیر، برخی فقط بایت می‌دهند
+      // path فقط وقتی پر است که URI طرح file داشته باشد؛
+      // در غیر این صورت از xFile استفاده می‌کنیم
       final path = picked.path;
-      final raw = path != null && File(path).existsSync()
-          ? await File(path).readAsString()
-          : (picked.bytes != null ? utf8.decode(picked.bytes!) : null);
-      if (raw == null) {
+      final String? raw;
+      if (path != null && File(path).existsSync()) {
+        raw = await File(path).readAsString();
+      } else {
+        raw = await picked.xFile.readAsString();
+      }
+      if (raw.isEmpty) {
         _toast('فایل خوانده نشد', error: true);
         return;
       }
