@@ -14,8 +14,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   # سبک و کم‌حجم — بدون syncfusion سنگین
-  pdfx: ^2.6.0
-  epubx: ^4.0.0
+
+  epub_plus: ^5.1.0
   flutter_riverpod: ^2.5.1
   flutter_tts: ^4.0.2
   file_picker: ^13.1.0
@@ -26,11 +26,27 @@ dependencies:
   shared_preferences: ^2.2.3
   sqflite: ^2.3.0
   flutter_widget_from_html_core: ^0.16.1
+  pdfrx: ^2.6.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+
+# دو override لازم است و هر دو بررسی شده‌اند، نه حدس:
+#
+# image — epubx 4.0.0 روی image ^3.0.8 قفل شده، ولی کد pdfrx_engine با API
+#   نسخه ۴ نوشته شده و با نسخه ۳ اصلاً کامپایل نمی‌شود. همچنین نسخه‌های ۴.۷
+#   به بالای image روی archive 4 می‌نشینند.
+#
+# archive — epubx روی archive ^3 و pdfrx_engine 0.4.6 به بالا روی archive 4
+#   قفل شده‌اند، پس بدون override هیچ نسخه‌ای از pdfrx با این پروژه قابل
+#   استفاده نیست. تنها API که epubx از archive صدا می‌زند
+#   ZipDecoder().decodeBytes است که در نسخه ۴ هم هست، و تست‌های EPUB پروژه
+#   هم آن را پوشش می‌دهند.
+dependency_overrides:
+  image: 4.8.0
+  archive: 4.3.0
 
 flutter:
   uses-material-design: true

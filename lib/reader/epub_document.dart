@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:epubx/epubx.dart';
+import 'package:epub_plus/epub_plus.dart';
 
 import 'epub_html.dart';
 
@@ -120,12 +120,12 @@ class EpubDocument {
   }
 
   factory EpubDocument.fromBook(EpubBook book) {
-    final content = book.Content;
-    final htmlFiles = content?.Html;
+    final content = book.content;
+    final htmlFiles = content?.html;
     if (htmlFiles == null || htmlFiles.isEmpty) {
       return EpubDocument(
-        title: book.Title,
-        author: book.Author,
+        title: book.title,
+        author: book.author,
         sections: const [],
         toc: const [],
         coverBytes: _coverBytes(book),
@@ -134,20 +134,20 @@ class EpubDocument {
 
     // manifest id → href، برای تبدیل IdRef های spine به مسیر فایل
     final idToHref = <String, String>{};
-    for (final item in book.Schema?.Package?.Manifest?.Items ?? const []) {
-      final id = item.Id;
-      final href = item.Href;
+    for (final item in book.schema?.package?.manifest?.items ?? const []) {
+      final id = item.id;
+      final href = item.href;
       if (id != null && href != null) idToHref[id] = _safeDecode(href);
     }
 
     // ── ترتیب خواندن از spine ──
     final ordered = <EpubSection>[];
     final hrefToIndex = <String, int>{};
-    final spineItems = book.Schema?.Package?.Spine?.Items;
+    final spineItems = book.schema?.package?.spine?.items;
 
     if (spineItems != null && spineItems.isNotEmpty) {
       for (final ref in spineItems) {
-        final idRef = ref.IdRef;
+        final idRef = ref.idRef;
         if (idRef == null) continue;
         final href = idToHref[idRef];
         if (href == null) continue;
@@ -157,7 +157,7 @@ class EpubDocument {
         ordered.add(EpubSection(
           index: ordered.length,
           href: href,
-          html: file.Content ?? '',
+          html: file.content ?? '',
         ));
       }
     }
@@ -171,14 +171,14 @@ class EpubDocument {
         ordered.add(EpubSection(
           index: ordered.length,
           href: href,
-          html: entry.value.Content ?? '',
+          html: entry.value.content ?? '',
         ));
       }
     }
 
     // ── فهرست مطالب ──
     final toc = <TocEntry>[];
-    for (final chapter in book.Chapters ?? const <EpubChapter>[]) {
+    for (final chapter in book.chapters ?? const <EpubChapter>[]) {
       _flatten(chapter, 0, hrefToIndex, toc);
     }
 
@@ -214,8 +214,8 @@ class EpubDocument {
         : toc;
 
     return EpubDocument(
-      title: book.Title,
-      author: book.Author,
+      title: book.title,
+      author: book.author,
       sections: titled,
       toc: effectiveToc,
       coverBytes: _coverBytes(book),
@@ -241,8 +241,8 @@ class EpubDocument {
     Map<String, int> hrefToIndex,
     List<TocEntry> out,
   ) {
-    final href = chapter.ContentFileName;
-    final title = _cleanTitle(chapter.Title) ?? 'بدون عنوان';
+    final href = chapter.contentFileName;
+    final title = _cleanTitle(chapter.title) ?? 'بدون عنوان';
     // اگر نگاشت با مسیر decode‌شده پیدا نشد، با کلید خام امتحان می‌کنیم
     final index = href == null
         ? null
@@ -250,10 +250,10 @@ class EpubDocument {
     out.add(TocEntry(
       title: title,
       sectionIndex: index,
-      anchor: chapter.Anchor,
+      anchor: chapter.anchor,
       depth: depth,
     ));
-    for (final sub in chapter.SubChapters ?? const <EpubChapter>[]) {
+    for (final sub in chapter.subChapters ?? const <EpubChapter>[]) {
       _flatten(sub, depth + 1, hrefToIndex, out);
     }
   }
@@ -266,7 +266,7 @@ class EpubDocument {
 
   static Uint8List? _coverBytes(EpubBook book) {
     try {
-      final bytes = book.CoverImage?.getBytes();
+      final bytes = book.coverImage?.getBytes();
       if (bytes == null || bytes.isEmpty) return null;
       return Uint8List.fromList(bytes);
     } catch (_) {

@@ -40,8 +40,17 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.24.5'
+          flutter-version: '3.47.5'
           cache: true
+
+      - name: نصب CMake برای موتور PDF
+        # موتور PDF (pdfium) از native assets استفاده می‌کند و بیلد APK
+        # بدون CMake با خطای «CMake was not found in SDK» شکست می‌خورد.
+        run: |
+          set -euo pipefail
+          yes | sdkmanager "cmake;3.22.1" > /dev/null
+          sdkmanager --list_installed | grep -q "cmake;3.22.1" \
+            && echo "cmake;3.22.1 آماده است."
 
       - name: بازیابی کلید امضا
         id: keystore

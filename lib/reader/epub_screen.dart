@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 // فقط EpubReader لازم است؛ کلاس Image این پکیج با Image فلاتر تداخل دارد
-import 'package:epubx/epubx.dart' show EpubReader;
+import 'package:epub_plus/epub_plus.dart' show EpubReader;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

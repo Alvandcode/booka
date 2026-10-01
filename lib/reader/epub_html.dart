@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:epubx/epubx.dart';
+import 'package:epub_plus/epub_plus.dart';
 import 'package:html/parser.dart' as html_parser;
 
 /// آماده‌سازی HTML بخش‌های EPUB برای رندر.
@@ -140,12 +140,12 @@ class EpubHtml {
 
   /// ساخت نقشه تصاویر از محتوای کتاب، برای [inlineImages]
   static Map<String, List<int>> imageMap(EpubBook book) {
-    final raw = book.Content?.Images;
+    final raw = book.content?.images;
     if (raw == null || raw.isEmpty) return const {};
     final out = <String, List<int>>{};
     raw.forEach((href, file) {
       try {
-        final bytes = file.Content;
+        final bytes = file.content;
         if (bytes != null && bytes.isNotEmpty) out[href] = bytes;
       } catch (_) {
         // تصویر خراب نادیده گرفته می‌شود
@@ -156,13 +156,13 @@ class EpubHtml {
 
   /// یکپارچه‌سازی CSS های داخل کتاب (به ترتیب نام فایل)
   static String combinedCss(EpubBook book) {
-    final raw = book.Content?.Css;
+    final raw = book.content?.css;
     if (raw == null || raw.isEmpty) return '';
     final keys = raw.keys.toList()..sort();
     final buffer = StringBuffer();
     for (final k in keys) {
       try {
-        buffer.writeln(raw[k]?.Content ?? '');
+        buffer.writeln(raw[k]?.content ?? '');
       } catch (_) {}
     }
     return buffer.toString();

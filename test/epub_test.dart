@@ -1,6 +1,6 @@
 import 'package:book_reader_app/reader/epub_document.dart';
 import 'package:book_reader_app/reader/epub_text.dart';
-import 'package:epubx/epubx.dart';
+import 'package:epub_plus/epub_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// یک ورودی فهرست مطالب
@@ -10,11 +10,12 @@ EpubChapter tocChapter(
   String? anchor,
   List<EpubChapter>? children,
 }) =>
-    EpubChapter()
-      ..Title = title
-      ..ContentFileName = href
-      ..Anchor = anchor
-      ..SubChapters = children;
+    EpubChapter(
+      title: title,
+      contentFileName: href,
+      anchor: anchor,
+      subChapters: children ?? const <EpubChapter>[],
+    );
 
 /// ساخت یک EpubBook با ترتیب manifest عمداً الفبایی و ترتیب spine متفاوت،
 /// تا اگر کد به ترتیب manifest تکیه کند تست لو برود.
@@ -37,35 +38,37 @@ EpubBook buildBook({
   // manifest به ترتیب الفبایی: a, b, c
   for (final href in hrefs.keys.toList()..sort()) {
     final id = 'id-${href.split('.').first}';
-    manifestItems.add(EpubManifestItem()
-      ..Id = id
-      ..Href = href
-      ..MediaType = 'application/xhtml+xml');
-    html[href] = EpubTextContentFile()
-      ..Content = htmlByHref?[href] ?? '<p>x</p>';
+    manifestItems.add(EpubManifestItem(
+      id: id,
+      href: href,
+      mediaType: 'application/xhtml+xml',
+    ));
+    html[href] = EpubTextContentFile(
+        content: htmlByHref?[href] ?? '<p>x</p>');
   }
 
-  final spine = EpubSpine();
-  if (withSpine) {
-    spine.Items = (spineOrder ?? ['id-c', 'id-a', 'id-b'])
-        .map((id) => EpubSpineItemRef()..IdRef = id)
-        .toList();
-  }
+  final spine = EpubSpine(
+    items: withSpine
+        ? (spineOrder ?? ['id-c', 'id-a', 'id-b'])
+            .map((id) => EpubSpineItemRef(idRef: id, isLinear: true))
+            .toList()
+        : const <EpubSpineItemRef>[],
+    ltr: true,
+  );
 
-  final navMap = EpubNavigationMap()
-    ..Points = <EpubNavigationPoint>[];
-
-  final book = EpubBook()
-    ..Title = 'کتاب آزمایشی'
-    ..Author = 'نویسنده'
-    ..Content = (EpubContent()..Html = html)
-    ..Schema = (EpubSchema()
-      ..Package = (EpubPackage()
-        ..Manifest = (EpubManifest()..Items = manifestItems)
-        ..Spine = spine)
-      ..Navigation = (EpubNavigation()..NavMap = navMap))
-    ..Chapters = chapters ??
-        [tocChapter('فصل ج', 'c.xhtml'), tocChapter('فصل الف', 'a.xhtml')];
+  final book = EpubBook(
+    title: 'کتاب آزمایشی',
+    author: 'نویسنده',
+    content: EpubContent(html: html),
+    schema: EpubSchema(
+      package: EpubPackage(
+        manifest: EpubManifest(items: manifestItems),
+        spine: spine,
+      ),
+    ),
+    chapters: chapters ??
+        [tocChapter('فصل ج', 'c.xhtml'), tocChapter('فصل الف', 'a.xhtml')],
+  );
 
   return book;
 }
@@ -107,7 +110,7 @@ void main() {
     });
 
     test('کتاب بدون محتوای HTML، خالی برمی‌گردد نه کرش', () {
-      final book = EpubBook()..Title = 'خالی';
+      final book = EpubBook(title: 'خالی');
       final doc = EpubDocument.fromBook(book);
       expect(doc.isEmpty, isTrue);
       expect(doc.length, 0);
