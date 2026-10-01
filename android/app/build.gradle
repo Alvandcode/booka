@@ -60,11 +60,14 @@ android {
     signingConfigs {
         if (hasReleaseKey) {
             release {
-                // مسیر کلید می‌تواند مطلق یا نسبی باشد. مسیرهای مطلق
-                // ویندوز (C:\...) در Groovy به‌درستی تفسیر نمی‌شوند،
-                // پس با URI به File تبدیل می‌شود.
+                // فقط وقتی ورودی واقعاً URI است (مثل file:///C:/...) باید
+                // از new URI عبور کند. مسیرهای مطلق لینوکس مثل
+                // /home/runner/... مطلق‌اند ولی URI نیستند، و new
+                // File(new URI(...)) روی آن‌ها با «URI is not absolute»
+                // شکست می‌خورد؛ file() هر دو حالت مطلق و نسبی را پوشش
+                // می‌دهد.
                 def storePath = keystoreProperties["storeFile"]
-                storeFile = storePath.contains("://") || storePath.startsWith("/")
+                storeFile = storePath.contains("://")
                         ? new File(new URI(storePath))
                         : rootProject.file(storePath)
                 storePassword = keystoreProperties["storePassword"]
