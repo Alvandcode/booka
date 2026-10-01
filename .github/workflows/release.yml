@@ -46,18 +46,34 @@ jobs:
       - name: نصب CMake برای موتور PDF
         # موتور PDF (pdfium) از native assets استفاده می‌کند و بیلد APK
         # بدون CMake با خطای «CMake was not found in SDK» شکست می‌خورد.
-        # روی runner اوبونتو خودِ sdkmanager روی PATH نیست، پس با مسیر
-        # کامل صدا زده می‌شود.
+        # روی runner اوبونتو نه sdkmanager روی PATH است و نه لزوماً
+        # ANDROID_HOME تنظیم شده، پس مسیر SDK را پیدا می‌کنیم و اول
+        # بررسی می‌کنیم که شاید از قبل نصب باشد.
         run: |
-          set -euo pipefail
-          SDK_ROOT="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
-          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "$SDKMANAGER" ]; then
-            SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -name sdkmanager -type f | head -1)"
+          set -uo pipefail
+          SDK_ROOT=""
+          for d in "${ANDROID_HOME:-}" "${ANDROID_SDK_ROOT:-}" \
+                   /usr/local/lib/android/sdk "$HOME/Android/Sdk"; do
+            if [ -n "$d" ] && [ -d "$d/cmdline-tools" ]; then SDK_ROOT="$d"; break; fi
+          done
+          if [ -z "$SDK_ROOT" ]; then
+            echo "::error::Android SDK پیدا نشد"
+            exit 1
           fi
-          yes | "$SDKMANAGER" "cmake;3.22.1" > /dev/null
-          "$SDKMANAGER" --list_installed | grep -q "cmake;3.22.1" \
-            && echo "cmake;3.22.1 آماده است."
+          echo "Android SDK: $SDK_ROOT"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -name sdkmanager -type f 2>/dev/null | head -1)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "::error::sdkmanager پیدا نشد"
+            exit 1
+          fi
+          if "$SDKMANAGER" --list_installed | grep -q "cmake;3.22.1"; then
+            echo "cmake;3.22.1 از قبل نصب است."
+          else
+            yes | "$SDKMANAGER" "cmake;3.22.1" || true
+            "$SDKMANAGER" --list_installed | grep -q "cmake;3.22.1" \
+              || { echo "::error::نصب cmake ناموفق بود"; exit 1; }
+            echo "cmake;3.22.1 نصب شد."
+          fi
 
       - name: بازیابی کلید امضا
         id: keystore
