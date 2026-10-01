@@ -178,7 +178,7 @@ class EpubDocument {
 
     // ── فهرست مطالب ──
     final toc = <TocEntry>[];
-    for (final chapter in book.chapters ?? const <EpubChapter>[]) {
+    for (final chapter in book.chapters) {
       _flatten(chapter, 0, hrefToIndex, toc);
     }
 
@@ -253,7 +253,7 @@ class EpubDocument {
       anchor: chapter.anchor,
       depth: depth,
     ));
-    for (final sub in chapter.subChapters ?? const <EpubChapter>[]) {
+    for (final sub in chapter.subChapters) {
       _flatten(sub, depth + 1, hrefToIndex, out);
     }
   }

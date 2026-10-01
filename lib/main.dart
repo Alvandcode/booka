@@ -121,7 +121,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         allowedExtensions: ['pdf', 'epub'],
       );
       // pickFiles در نسخه ۱۳ یک لیست برمی‌گرداند
-      final picked = res?.firstOrNull;
+      final picked = res.firstOrNull;
       final src = picked?.path;      if (picked == null || src == null || !File(src).existsSync()) return;
 
       final ext = picked.extension?.toLowerCase() ?? '';

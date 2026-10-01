@@ -121,7 +121,7 @@ class _ExportPageState extends ConsumerState<ExportPage> {
         allowedExtensions: ['json'],
       );
       // pickFiles در نسخه ۱۳ یک لیست برمی‌گرداند
-      final picked = res?.firstOrNull;
+      final picked = res.firstOrNull;
       if (picked == null) {
         _toast('فایلی انتخاب نشد');
         return;
