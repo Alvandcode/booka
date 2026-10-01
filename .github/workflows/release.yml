@@ -112,6 +112,9 @@ jobs:
         run: flutter build apk --release --split-per-abi
 
       - name: ساخت App Bundle برای فروشگاه
+        # بلوک splits.abi از android/app/build.gradle حذف شد، چون با
+        # ساخت App Bundle ناسازگار بود و AGP اجازه نمی‌داد هر دو خروجی از
+        # یک درخت ساخته شوند.
         run: flutter build appbundle --release
 
       - name: انتشار در صفحه Releases
