@@ -46,10 +46,17 @@ jobs:
       - name: نصب CMake برای موتور PDF
         # موتور PDF (pdfium) از native assets استفاده می‌کند و بیلد APK
         # بدون CMake با خطای «CMake was not found in SDK» شکست می‌خورد.
+        # روی runner اوبونتو خودِ sdkmanager روی PATH نیست، پس با مسیر
+        # کامل صدا زده می‌شود.
         run: |
           set -euo pipefail
-          yes | sdkmanager "cmake;3.22.1" > /dev/null
-          sdkmanager --list_installed | grep -q "cmake;3.22.1" \
+          SDK_ROOT="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -name sdkmanager -type f | head -1)"
+          fi
+          yes | "$SDKMANAGER" "cmake;3.22.1" > /dev/null
+          "$SDKMANAGER" --list_installed | grep -q "cmake;3.22.1" \
             && echo "cmake;3.22.1 آماده است."
 
       - name: بازیابی کلید امضا
