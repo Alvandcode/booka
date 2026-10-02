@@ -17,14 +17,13 @@
 
 ### نصب
 
-۱. از [آخرین Release](https://github.com/Alvandcode/booka/releases/latest) فایل درست معماری گوشی را بگیرید:
-   - بیشتر گوشی‌های امروزی: `app-arm64-v8a-release.apk`
-   - گوشی‌های خیلی قدیمی ۳۲بیتی: `app-armeabi-v7a-release.apk`
-   - شبیه‌ساز/دستگاه x86_64: `app-x86_64-release.apk`
+۱. از [آخرین Release](https://github.com/Alvandcode/booka/releases/latest) فایل را بگیرید:
+   - اگر معماری دستگاه را نمی‌دانید: `app-universal-release.apk` روی همه کار می‌کند ولی بزرگ‌تر است.
+   - برای دانلود کم‌حجم‌تر: بیشتر گوشی‌ها `app-arm64-v8a-release.apk`، گوشی‌های خیلی قدیمی `app-armeabi-v7a-release.apk`، شبیه‌ساز `app-x86_64-release.apk`.
 ۲. نصب از منبع ناشناس را فقط برای همان مرورگر/فایل‌ساز روشن کنید.
 ۳. همه نسخه‌ها با یک کلید دائمی امضا می‌شوند؛ نسخه جدید روی قبلی نصب می‌شود.
 
-در `v0.1.0` فایل universal منتشر نشده است. جزئیات کامل در [راهنمای نصب](docs/INSTALL.fa.md) و آموزش تصویری در [صفحه آموزش](https://alvandcode.github.io/booka/tutorial.html) است.
+فایل یکپارچه `app-universal-release.apk` هم در همان صفحه هست. جزئیات کامل در [راهنمای نصب](docs/INSTALL.fa.md) و آموزش کامل در [صفحه آموزش](https://alvandcode.github.io/booka/tutorial.html) است.
 
 ### قابلیت‌ها
 
@@ -65,14 +64,13 @@
 
 ### Install
 
-1. From [latest Release](https://github.com/Alvandcode/booka/releases/latest), pick the APK for your device ABI:
-   - Most modern phones: `app-arm64-v8a-release.apk`
-   - Very old 32-bit phones: `app-armeabi-v7a-release.apk`
-   - x86_64 emulator/device: `app-x86_64-release.apk`
+1. From [latest Release](https://github.com/Alvandcode/booka/releases/latest), pick an APK:
+   - Unsure about your device: `app-universal-release.apk` works everywhere but is bigger.
+   - For a smaller download: most modern phones take `app-arm64-v8a-release.apk`, very old 32-bit phones `app-armeabi-v7a-release.apk`, x86_64 emulator `app-x86_64-release.apk`.
 2. Enable “Install unknown apps” only for the browser/file manager you download with.
 3. Every release is signed with one permanent key, so updates install over the previous version.
 
-There is no universal APK in `v0.1.0`. See [install guide](docs/INSTALL.fa.md) and the [step-by-step tutorial](https://alvandcode.github.io/booka/tutorial.html).
+A universal `app-universal-release.apk` is also on the same page. See [install guide](docs/INSTALL.fa.md) and the [step-by-step tutorial](https://alvandcode.github.io/booka/tutorial.html).
 
 ### Features
 

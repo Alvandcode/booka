@@ -157,9 +157,10 @@
   </div>
   <div class="card">
     <h3>کدام فایل؟</h3>
-    <p>در نسخه 0.1.0 فایل یکپارچه universal منتشر نشده؛ پس فایل درست معماری دستگاه را از صفحه Releases بردار:</p>
+    <p>اگر معماری دستگاه را نمی‌دانی، فایل یکپارچه را بردار که روی همه کار می‌کند؛ وگرنه فایل درست معماری را بگیر تا کم‌حجم‌تر دانلود شود:</p>
     <div class="tbl-wrap"><table>
       <tr><th>دستگاه</th><th>فایل</th></tr>
+      <tr><td>هر دستگاهی (ساده‌ترین راه، حدود ۸۰ مگ)</td><td><code class="inline">app-universal-release.apk</code></td></tr>
       <tr><td>بیشتر گوشی‌های امروزی</td><td><code class="inline">app-arm64-v8a-release.apk</code></td></tr>
       <tr><td>گوشی‌های خیلی قدیمی ۳۲بیتی</td><td><code class="inline">app-armeabi-v7a-release.apk</code></td></tr>
       <tr><td>شبیه‌ساز یا دستگاه x86_64</td><td><code class="inline">app-x86_64-release.apk</code></td></tr>
@@ -342,7 +343,7 @@
   </div>
   <div class="card"><div class="tbl-wrap"><table>
     <tr><th>نشانه</th><th>علت</th><th>راه‌حل</th></tr>
-    <tr><td>نصب نمی‌شود یا «بسته نامعتبر است»</td><td>فایل با معماری گوشی نمی‌خواند</td><td>فایل درست جدول نصب را بگیر؛ بیشتر گوشی‌ها arm64 هستند</td></tr>
+    <tr><td>نصب نمی‌شود یا «بسته نامعتبر است»</td><td>فایل با معماری گوشی نمی‌خواند</td><td>فایل یکپارچه <code class="inline">app-universal-release.apk</code> را بگیر</td></tr>
     <tr><td>جستجو یا هایلایت PDF کار نمی‌کند</td><td>PDF اسکن‌شده و بدون لایه متنی است</td><td>طبیعی است؛ این قابلیت‌ها روی عکس جواب نمی‌دهند و OCR لازم دارند</td></tr>
     <tr><td>تلفظ کار نمی‌کند</td><td>موتور گفتار روی گوشی نیست</td><td>Google Text-to-Speech یا موتور مشابه را نصب کن</td></tr>
     <tr><td>بعد از بازیابی، کتابی وصل نیست</td><td>فایل کتاب روی دستگاه جدید وارد نشده</td><td>اول کتاب‌ها را وارد کن، بعد همان بکاپ را دوباره بازیابی کن</td></tr>
