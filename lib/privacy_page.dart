@@ -67,7 +67,7 @@ class PrivacyPage extends StatelessWidget {
           ),
           const _Section(
             title: 'تماس',
-            body: 'اگر پرسشی دارید: تلگرام a.c.official — سازنده: alvandcode.github.io',
+            body: 'اگر پرسشی دارید: تلگرام a_c_official — سازنده: alvandcode.github.io',
           ),
         ],
       ),

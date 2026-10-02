@@ -9,7 +9,9 @@ class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 
   static const _site = 'alvandcode.github.io';
-  static const _telegram = 'a.c.official';
+  // نقطه در یوزرنیم تلگرام مجاز نیست؛ فقط حرف، رقم و زیرخط پذیرفته
+  // می‌شود. همان @a_c_official که در وب‌سایت هم آمده.
+  static const _telegram = 'a_c_official';
   static const _github = 'https://github.com/alvandcode';
   static const _ton =
       'UQCB9rzvwmq0FJDaBkHVdBgbfZPb06FWdKco3woAHH6AXuUt';

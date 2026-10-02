@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آموزش قدم‌به‌قدم Booka | کتابخوان آفلاین PDF و EPUB</title>
+<meta name="description" content="آموزش نصب و استفاده از Booka: کتابخوان آفلاین PDF و EPUB با هایلایت متن واقعی، دیکشنری آفلاین، لایتنر، بکاپ و خروجی.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14121f; --bg2:#1c182d; --card:#221d38; --card2:#292344;
+    --line:rgba(255,255,255,.10); --txt:#f5f1e8; --muted:#b8b0a1;
+    --gold:#c9a86a; --gold-d:#9c7c46; --teal:#7fd4c1; --green:#7fc98f;
+    --rose:#e58b8b; --amber:#e0b96f; --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; color:var(--txt);
+    font-family:"Vazirmatn",Tahoma,"Segoe UI",sans-serif;
+    background:
+      radial-gradient(1100px 500px at 85% -5%, rgba(201,168,106,.16), transparent 60%),
+      radial-gradient(900px 480px at 10% 0%, rgba(127,212,193,.12), transparent 60%),
+      linear-gradient(180deg,var(--bg),var(--bg2));
+    line-height:2; font-size:16px;
+  }
+  a{color:var(--gold)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px 90px}
+  .hero{position:relative;overflow:hidden;border-radius:0 0 34px 34px;
+    background:linear-gradient(135deg,#3a2f18 0%,#6b5426 45%,#14121f 100%);
+    padding:64px 20px 70px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.45);
+    border-bottom:1px solid rgba(201,168,106,.35)}
+  .hero::before,.hero::after{content:"";position:absolute;border-radius:50%;opacity:.22}
+  .hero::before{width:340px;height:340px;background:#c9a86a;top:-160px;left:-90px}
+  .hero::after{width:260px;height:260px;background:#7fd4c1;bottom:-140px;right:-70px}
+  .hero h1{margin:0 0 10px;font-size:clamp(26px,5vw,46px);font-weight:900;text-shadow:0 3px 18px rgba(0,0,0,.45)}
+  .hero p{margin:8px auto 0;max-width:760px;color:#f5f1e8;font-size:clamp(15px,2.6vw,19px)}
+  .hero .badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+  .badge{background:rgba(255,255,255,.10);border:1px solid rgba(201,168,106,.45);
+    padding:6px 16px;border-radius:999px;font-size:14px;font-weight:700;backdrop-filter:blur(6px)}
+  .hero .cta{margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .hero .cta a{text-decoration:none;font-weight:900;padding:12px 30px;border-radius:999px;transition:.2s}
+  .btn-star{background:var(--gold);color:#14121f}
+  .btn-ghost{background:rgba(0,0,0,.30);color:#fff;border:1px solid rgba(201,168,106,.65)}
+  .hero .cta a:hover{transform:translateY(-3px)}
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
+    background:rgba(20,18,31,.86);border-bottom:1px solid var(--line)}
+  nav .inner{max-width:1060px;margin:0 auto;padding:10px 16px;display:flex;gap:8px;
+    overflow-x:auto;scrollbar-width:none}
+  nav .inner::-webkit-scrollbar{display:none}
+  nav a{flex:0 0 auto;text-decoration:none;color:var(--txt);font-weight:700;font-size:14px;
+    padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+    transition:.2s}
+  nav a:hover,nav a.active{background:var(--gold);color:#14121f;border-color:var(--gold)}
+  section{margin-top:46px}
+  .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .sec-head .ico{width:52px;height:52px;flex:0 0 52px;border-radius:16px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--gold-d),#4a3d22);box-shadow:0 10px 26px rgba(201,168,106,.22)}
+  .sec-head .ico svg{width:28px;height:28px;stroke:#fff}
+  .sec-head h2{margin:0;font-size:clamp(20px,3.6vw,28px);font-weight:900}
+  .sec-head small{display:block;color:var(--muted);font-weight:400;font-size:14px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));
+    border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:16px 0;
+    box-shadow:0 14px 40px rgba(0,0,0,.35)}
+  .card h3{margin:0 0 8px;font-size:19px;color:var(--gold)}
+  .card h3 .tag{font-size:12px;background:rgba(201,168,106,.14);border:1px solid rgba(201,168,106,.45);
+    color:var(--gold);border-radius:999px;padding:2px 12px;margin-right:8px;vertical-align:middle}
+  .card h3 .tag.ok{background:rgba(127,201,143,.12);border-color:rgba(127,201,143,.45);color:var(--green)}
+  .card h3 .tag.warn{background:rgba(229,139,139,.12);border-color:rgba(229,139,139,.45);color:var(--rose)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+  .mini{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .mini b{color:var(--gold)}
+  ol.steps,ul.tips{margin:10px 0;padding-right:22px}
+  ol.steps li,ul.tips li{margin:8px 0}
+  ol.steps li::marker{color:var(--gold);font-weight:900}
+  .code{position:relative;background:#0f0d18;border:1px solid var(--line);border-radius:14px;
+    margin:12px 0;overflow:hidden}
+  .code header{display:flex;justify-content:space-between;align-items:center;
+    padding:6px 14px;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line);
+    background:rgba(255,255,255,.03)}
+  .code pre{direction:ltr;text-align:left;margin:0;padding:14px 16px;overflow-x:auto;
+    font-family:Consolas,"Cascadia Code",monospace;font-size:13.5px;line-height:1.9;color:#f0e6cf}
+  .copy{cursor:pointer;border:1px solid var(--gold);background:transparent;color:var(--gold);
+    border-radius:9px;padding:3px 14px;font-family:inherit;font-size:12.5px;font-weight:700;transition:.2s}
+  .copy:hover{background:var(--gold);color:#14121f}
+  .note{border-radius:14px;padding:14px 18px;margin:12px 0;font-size:15px;border:1px solid}
+  .note.info{background:rgba(127,212,193,.10);border-color:rgba(127,212,193,.40)}
+  .note.ok{background:rgba(127,201,143,.10);border-color:rgba(127,201,143,.40)}
+  .note.warn{background:rgba(224,185,111,.10);border-color:rgba(224,185,111,.45)}
+  .note.bad{background:rgba(229,139,139,.10);border-color:rgba(229,139,139,.45)}
+  .note b{display:block;margin-bottom:2px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:right;vertical-align:top}
+  th{background:rgba(201,168,106,.14);color:var(--gold)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.025)}
+  .tbl-wrap{overflow-x:auto;border-radius:14px}
+  code.inline{direction:ltr;display:inline-block;background:rgba(255,255,255,.06);
+    border:1px solid var(--line);border-radius:8px;padding:0 8px;font-size:13.5px}
+  footer{margin-top:60px;text-align:center;color:var(--muted);font-size:14px}
+  footer .links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+  footer .links a{text-decoration:none;font-weight:700;border:1px solid var(--gold);
+    border-radius:999px;padding:8px 26px}
+  footer .top{display:inline-block;margin-top:12px;text-decoration:none;font-weight:700;
+    border:1px solid var(--gold);border-radius:999px;padding:8px 26px}
+  footer .addr{direction:ltr;display:inline-block;max-width:100%;overflow-wrap:anywhere;
+    border:1px dashed rgba(201,168,106,.55);border-radius:10px;padding:6px 12px;margin-top:8px}
+  @media (max-width:640px){
+    body{font-size:15px}
+    .card{padding:18px}
+    .sec-head .ico{width:44px;height:44px;flex-basis:44px}
+  }
+</style>
+</head>
+<body id="top">
+
+<header class="hero">
+  <h1>آموزش قدم‌به‌قدم Booka</h1>
+  <p>کتابخوان آفلاین PDF و EPUB؛ از نصب تا هایلایت، دیکشنری، لایتنر و بکاپ — بدون حساب، بدون تبلیغ، بدون اینترنت</p>
+  <div class="badges">
+    <span class="badge">اندروید</span>
+    <span class="badge">PDF و EPUB</span>
+    <span class="badge">دیکشنری آفلاین</span>
+    <span class="badge">بدون هیچ دسترسی</span>
+    <span class="badge">فونت وزیرمتن</span>
+    <span class="badge">نسخه 0.1.0</span>
+  </div>
+  <div class="cta">
+    <a class="btn-star" href="https://github.com/Alvandcode/booka/releases/latest" target="_blank" rel="noopener">دانلود آخرین نسخه</a>
+    <a class="btn-ghost" href="https://github.com/Alvandcode/booka" target="_blank" rel="noopener">صفحه گیت‌هاب</a>
+    <a class="btn-ghost" href="https://t.me/a_c_official" target="_blank" rel="noopener">کانال تلگرام</a>
+  </div>
+</header>
+
+<nav><div class="inner" id="navlinks">
+  <a href="#install">نصب</a>
+  <a href="#start">شروع</a>
+  <a href="#epub">EPUB</a>
+  <a href="#pdf">PDF</a>
+  <a href="#marks">نشان و هایلایت</a>
+  <a href="#leitner">لایتنر</a>
+  <a href="#dict">دیکشنری</a>
+  <a href="#theme">تم و فونت</a>
+  <a href="#backup">بکاپ</a>
+  <a href="#why">چرا Booka</a>
+  <a href="#faq">عیب‌یابی</a>
+  <a href="#support">حمایت</a>
+</div></nav>
+
+<div class="wrap">
+
+<section id="install">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg></span>
+    <h2>بخش اول: نصب<small>فایل درست معماری گوشی را انتخاب کن</small></h2>
+  </div>
+  <div class="card">
+    <h3>کدام فایل؟</h3>
+    <p>در نسخه 0.1.0 فایل یکپارچه universal منتشر نشده؛ پس فایل درست معماری دستگاه را از صفحه Releases بردار:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>دستگاه</th><th>فایل</th></tr>
+      <tr><td>بیشتر گوشی‌های امروزی</td><td><code class="inline">app-arm64-v8a-release.apk</code></td></tr>
+      <tr><td>گوشی‌های خیلی قدیمی ۳۲بیتی</td><td><code class="inline">app-armeabi-v7a-release.apk</code></td></tr>
+      <tr><td>شبیه‌ساز یا دستگاه x86_64</td><td><code class="inline">app-x86_64-release.apk</code></td></tr>
+    </table></div>
+    <ol class="steps">
+      <li><b>دانلود:</b> از <a href="https://github.com/Alvandcode/booka/releases/latest" target="_blank" rel="noopener">آخرین Release</a> فایل درست را بگیر.</li>
+      <li><b>نصب از منبع ناشناس:</b> روی فایل بزن؛ اندروید هشدار می‌دهد. در اندروید ۸ به بعد مسیرش معمولاً این است: تنظیمات گوشی، برنامه‌ها، دسترسی خاص، «نصب برنامه‌های ناشناس»، و فعال‌کردن فقط برای همان مرورگر یا فایل‌ساز.</li>
+      <li><b>بروز نگه داشتن امضا:</b> همه نسخه‌ها با یک کلید دائمی امضا می‌شوند؛ نسخه جدید روی قبلی نصب می‌شود و کتاب‌ها و یادداشت‌ها می‌مانند.</li>
+    </ol>
+    <div class="note ok"><b>تأیید اصالت فایل</b>مقدار SHA256 فایل را با <code class="inline">checksums.txt</code> همان صفحه Release مقایسه کن.</div>
+    <div class="code"><header><span>windows powershell</span><button class="copy">کپی</button></header><pre>Get-FileHash .\app-arm64-v8a-release.apk -Algorithm SHA256</pre></div>
+    <div class="code"><header><span>linux / macos</span><button class="copy">کپی</button></header><pre>sha256sum app-arm64-v8a-release.apk</pre></div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2"/><path d="M4 19a2 2 0 0 0 2 2h13"/></svg></span>
+    <h2>بخش دوم: شروع<small>کتابخانه، ادامه مطالعه، سه تب اصلی</small></h2>
+  </div>
+  <div class="card">
+    <ol class="steps">
+      <li><b>افزودن کتاب:</b> فایل PDF یا EPUB را با انتخابگر سیستم وارد کن. اپ به کل حافظه دسترسی نمی‌خواهد؛ فقط همان فایلی که انتخاب می‌کنی خوانده می‌شود.</li>
+      <li><b>ادامه مطالعه:</b> موقعیت هر کتاب (صفحه یا بخش) ذخیره می‌شود؛ دفعه بعد از همان‌جا باز می‌شود.</li>
+      <li><b>سه تب «نشان‌ها»:</b> نشان، هایلایت و لایتنر هر کدام تب جدا دارند و تعدادشان روی تب دیده می‌شود.</li>
+    </ol>
+    <div class="note info"><b>کاور و نویسنده</b>کتابخانه کاور و نویسنده واقعی کتاب را نشان می‌دهد و برای کتاب بدون کاور، یک کاور ثابت از روی عنوان می‌سازد.</div>
+  </div>
+</section>
+
+<section id="epub">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 5a2 2 0 0 1 2-2h6v18H4a2 2 0 0 1-2-2z"/><path d="M22 5a2 2 0 0 0-2-2h-6v18h6a2 2 0 0 0 2-2z"/></svg></span>
+    <h2>بخش سوم: خواندن EPUB<small>قالب‌بندی کامل، جستجو، هایلایت</small></h2>
+  </div>
+  <div class="card">
+    <h3>دکمه‌های نوار بالا</h3>
+    <ul class="tips">
+      <li><b>فهرست مطالب:</b> ساختار سلسله‌مراتبی کتاب و پرش مستقیم به هر بخش.</li>
+      <li><b>جستجو در کتاب:</b> جستجوی متن همه بخش‌ها با برش متن پیرامون نتیجه.</li>
+      <li><b>نشان‌گذاری:</b> ذخیره همان بخش برای برگشت سریع.</li>
+      <li><b>نمایش ساده یا کامل:</b> حالت ساده فقط متن خالص را نشان می‌دهد؛ حالت کامل قالب‌بندی، تصویر و استایل خود کتاب را رندر می‌کند.</li>
+      <li><b>کوچک‌تر و بزرگ‌تر:</b> اندازه فونت همان‌جا در دسترس است؛ از تنظیمات هم می‌شود بین ۱۲ تا ۲۲ تغییرش داد.</li>
+    </ul>
+    <div class="note info"><b>تصویر و استایل کتاب</b>تصویرهای داخل خود کتاب به‌صورت امن داخل سند قرار می‌گیرند و CSS خود کتاب هم اعمال می‌شود؛ تصویرهای خیلی بزرگ برای کنترل حافظه رد می‌شوند.</div>
+  </div>
+  <div class="card">
+    <h3>انتخاب متن در EPUB</h3>
+    <p>متن را انتخاب کن؛ سه دکمه می‌آید:</p>
+    <div class="grid">
+      <div class="mini"><b>دیکشنری</b>اولین کلمه انگلیسی انتخاب را با معنی، تلفظ و دکمه لایتنر نشان می‌دهد.</div>
+      <div class="mini"><b>هایلایت</b>متن واقعی انتخاب را با همان بخش ذخیره می‌کند.</div>
+      <div class="mini"><b>کپی</b>متن انتخاب را در حافظه می‌گذارد.</div>
+    </div>
+  </div>
+</section>
+
+<section id="pdf">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/></svg></span>
+    <h2>بخش چهارم: خواندن PDF<small>انتخاب متن واقعی، جستجو، هایلایت قابل دیدن</small></h2>
+  </div>
+  <div class="card">
+    <h3>دکمه‌های نوار بالا</h3>
+    <ul class="tips">
+      <li><b>فهرست مطالب:</b> اگر خود PDF فهرست داشته باشد، سلسله‌مراتبی نشان داده می‌شود؛ ورودی خراب غیرقابل‌پرش می‌ماند.</li>
+      <li><b>جستجو در کتاب:</b> با ۳۵۰ میلی‌ثانیه مکث اجرا می‌شود تا با هر حرف، کل کتاب خوانده نشود؛ سقف ۲۰۰ نتیجه.</li>
+      <li><b>هایلایت‌های من:</b> هایلایت‌های همین کتاب را فهرست می‌کند؛ با لمس هر مورد، صفحه می‌رود و همان متن روی صفحه زرد می‌شود.</li>
+      <li><b>نشان‌گذاری صفحه:</b> همان صفحه را با شماره‌اش ذخیره می‌کند.</li>
+    </ul>
+    <div class="note warn"><b>PDF اسکن‌شده</b>اگر بالای صفحه نوشته «بدون لایه متنی» دیدی، یعنی این PDF فقط عکس است و متن قابل استخراج ندارد؛ پس جستجو، هایلایت متنی و دیکشنری روی آن کار نمی‌کند. این محدودیت موتور است و ربطی به تنظیمات ندارد؛ برای چنین کتابی OCR لازم است.</div>
+  </div>
+  <div class="card">
+    <h3>انتخاب متن در PDF</h3>
+    <p>متن را انتخاب کن؛ سه دکمه می‌آید:</p>
+    <div class="grid">
+      <div class="mini"><b>دیکشنری</b>روی اولین کلمه انگلیسی متن انتخابی.</div>
+      <div class="mini"><b>هایلایت</b>متن واقعی را با شماره صفحه ذخیره می‌کند و همان لحظه روی صفحه نشانش می‌دهد.</div>
+      <div class="mini"><b>کپی</b>متن انتخاب را در حافظه می‌گذارد.</div>
+    </div>
+  </div>
+</section>
+
+<section id="marks">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>
+    <h2>بخش پنجم: نشان و هایلایت<small>جستجوی متن کامل، پرش، حذف</small></h2>
+  </div>
+  <div class="card">
+    <ul class="tips">
+      <li><b>تب نشان:</b> با لمس هر نشان، همان کتاب در همان صفحه یا بخش باز می‌شود؛ با کشیدن یا دکمه حذف پاک می‌شود.</li>
+      <li><b>تب هایلایت:</b> روی خود پایگاه داده جستجوی متن کامل دارد؛ با لمس هر مورد، کتاب در همان‌جا باز می‌شود.</li>
+      <li><b>خروجی خوانا:</b> هایلایت‌ها و نشان‌ها را می‌شود به Markdown و واژگان را به CSV داد.</li>
+    </ul>
+    <div class="note info"><b>یادداشت و برچسب</b>مدل داده هایلایت جای یادداشت و برچسب دارد و در خروجی هم می‌آید، ولی در نسخه 0.1.0 ویرایشگر یادداشت و برچسب در رابط کاربری نیست؛ هایلایت جدید با رنگ ثابت ذخیره می‌شود.</div>
+  </div>
+</section>
+
+<section id="leitner">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></span>
+    <h2>بخش ششم: لایتنر<small>مرور با فاصله، با الگوریتم SM-2</small></h2>
+  </div>
+  <div class="card">
+    <ol class="steps">
+      <li><b>ساخت کارت:</b> از داخل دیکشنری دکمه «لایتنر» را بزن؛ واژه با معنی، جمله متن و نام کتاب ذخیره می‌شود.</li>
+      <li><b>مرور روزانه:</b> تب لایتنر فقط کارت‌های سررسیده را نشان می‌دهد؛ پاسخ که بدهی، فاصله مرور بعدی با SM-2 تنظیم می‌شود.</li>
+      <li><b>خروجی:</b> همه کارت‌ها را می‌شود به CSV سازگار با اکسل و Anki داد.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="dict">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2"/><path d="M8 7h8M8 11h8"/></svg></span>
+    <h2>بخش هفتم: دیکشنری آفلاین<small>۳۶٬۱۲۲ مدخل، بدون اینترنت</small></h2>
+  </div>
+  <div class="card">
+    <ul class="tips">
+      <li><b>داخل خود اپ:</b> فایل ۱.۶۴ مگابایتی دیکشنری همراه اپ نصب می‌شود؛ جستجو کاملاً محلی است و هیچ کلمه‌ای به اینترنت نمی‌رود.</li>
+      <li><b>تحمل خطای تایپی:</b> نشانه‌های فارسی و عربی دور کلمه و فاصله‌های اضافه تمیز می‌شوند و ریشه ساده انگلیسی هم امتحان می‌شود.</li>
+      <li><b>تلفظ:</b> با موتور گفتار خود گوشی؛ اگر موتوری نصب نباشد دکمه‌اش پنهان می‌شود.</li>
+      <li><b>کپی و لایتنر:</b> معنی را می‌شود کپی کرد یا مستقیم به لایتنر فرستاد.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="theme">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z"/></svg></span>
+    <h2>بخش هشتم: تم و فونت<small>چهار تم، فونت وزیرمتن</small></h2>
+  </div>
+  <div class="card">
+    <div class="grid">
+      <div class="mini"><b>کاغذی (روز)</b>روشن و تمیز برای مطالعه روزانه.</div>
+      <div class="mini"><b>سپیا</b>گرم و کم‌خسته‌کننده برای مطالعه طولانی.</div>
+      <div class="mini"><b>خاکستری (شب)</b>تیره ملایم برای نور کم.</div>
+      <div class="mini"><b>مشکی AMOLED</b>مشکی واقعی برای صرفه‌جویی باتری.</div>
+    </div>
+    <p>فونت همه‌جا وزیرمتن است و اندازه فونت ریدر از ۱۲ تا ۲۲ قابل تنظیم است.</p>
+  </div>
+</section>
+
+<section id="backup">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3v12"/><path d="M7 14l5 5 5-5"/><path d="M4 21h16"/></svg></span>
+    <h2>بخش نهم: بکاپ و خروجی<small>قبل از حذف اپ، حتماً بکاپ بگیر</small></h2>
+  </div>
+  <div class="card">
+    <ol class="steps">
+      <li><b>بکاپ کامل:</b> همه کتاب‌ها، نشان‌ها، هایلایت‌ها و لایتنر در یک فایل JSON خوانا ذخیره می‌شود.</li>
+      <li><b>بازیابی:</b> دو حالت دارد: «افزودن به داده فعلی» که تکراری‌ها را رد می‌کند، و «جایگزینی کامل» که داده فعلی را پاک می‌کند.</li>
+      <li><b>پیوند کتاب‌ها:</b> چون مسیر فایل در دستگاه جدید فرق می‌کند، بکاپ با نام فایل به کتاب وصل می‌شود؛ اگر کتاب را وارد نکرده باشی، فقط فراداده‌اش می‌ماند.</li>
+      <li><b>خروجی خوانا:</b> هایلایت‌ها و نشان‌ها به Markdown و واژگان به CSV.</li>
+    </ol>
+    <div class="note bad"><b>بکاپ فایل کتاب را ندارد</b>فقط فراداده و یادداشت‌ها ذخیره می‌شود، نه خود PDF و EPUB. برای انتقال به گوشی جدید اول کتاب‌ها را وارد کن، بعد بکاپ را بازیابی کن. با حذف اپ هم همه‌چیز پاک می‌شود.</div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg></span>
+    <h2>بخش دهم: چرا Booka<small>تفاوت با اپ‌های معمول فروشگاهی</small></h2>
+  </div>
+  <div class="card"><div class="tbl-wrap"><table>
+    <tr><th>موضوع</th><th>Booka</th><th>خیلی از اپ‌های فروشگاهی</th></tr>
+    <tr><td>حریم خصوصی</td><td>نسخه انتشار هیچ دسترسی اندروید نمی‌خواهد؛ بدون حساب، تبلیغ، تحلیلگر و اینترنت</td><td>حساب کاربری، تبلیغات و ردیابی</td></tr>
+    <tr><td>دیکشنری</td><td>داخل خود اپ و آفلاین، با تلفظ و ریشه‌یابی</td><td>آنلاین یا جداگانه و پولی</td></tr>
+    <tr><td>یادگیری</td><td>لایتنر با SM-2 که از همان متن کتاب کارت می‌سازد</td><td>هایلایت جدا از مرور واژه</td></tr>
+    <tr><td>خروجی داده</td><td>بکاپ JSON کامل به‌علاوه Markdown و CSV خوانا</td><td>قفل‌شدن داده داخل اپ یا خروجی محدود</td></tr>
+    <tr><td>PDF</td><td>انتخاب متن واقعی، جستجو، فهرست و تشخیص PDF اسکن‌شده</td><td>فقط ورق‌زدن یا متن بدون جستجو</td></tr>
+    <tr><td>بروزسانی</td><td>یک کلید امضای دائمی؛ نسخه جدید روی قبلی نصب می‌شود</td><td>امضاهای ناپایدار و نصب دوباره</td></tr>
+  </table></div></div>
+</section>
+
+<section id="faq">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".9"/></svg></span>
+    <h2>بخش یازدهم: عیب‌یابی سریع<small>۹۰٪ مشکل‌ها یکی از این‌هاست</small></h2>
+  </div>
+  <div class="card"><div class="tbl-wrap"><table>
+    <tr><th>نشانه</th><th>علت</th><th>راه‌حل</th></tr>
+    <tr><td>نصب نمی‌شود یا «بسته نامعتبر است»</td><td>فایل با معماری گوشی نمی‌خواند</td><td>فایل درست جدول نصب را بگیر؛ بیشتر گوشی‌ها arm64 هستند</td></tr>
+    <tr><td>جستجو یا هایلایت PDF کار نمی‌کند</td><td>PDF اسکن‌شده و بدون لایه متنی است</td><td>طبیعی است؛ این قابلیت‌ها روی عکس جواب نمی‌دهند و OCR لازم دارند</td></tr>
+    <tr><td>تلفظ کار نمی‌کند</td><td>موتور گفتار روی گوشی نیست</td><td>Google Text-to-Speech یا موتور مشابه را نصب کن</td></tr>
+    <tr><td>بعد از بازیابی، کتابی وصل نیست</td><td>فایل کتاب روی دستگاه جدید وارد نشده</td><td>اول کتاب‌ها را وارد کن، بعد همان بکاپ را دوباره بازیابی کن</td></tr>
+    <tr><td>فونت فارسی خراب دیده می‌شود</td><td>فایل دستکاری یا ناقص دانلود شده</td><td>فایل اصلی را از صفحه Release بگیر و با checksums.txt چک کن</td></tr>
+  </table></div></div>
+</section>
+
+<section id="support">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg></span>
+    <h2>بخش دوازدهم: حمایت<small>اگر Booka به کارت آمد</small></h2>
+  </div>
+  <div class="card">
+    <p>اگر از اپ خوشت آمد، یک تراکنش کوچک Ton برام بفرست. ممنونم!</p>
+    <p>آدرس کیف پول Ton:</p>
+    <p><span class="addr">UQCB9rzvwmq0FJDaBkHVdBgbfZPb06FWdKco3woAHH6AXuUt</span></p>
+    <div class="grid">
+      <div class="mini"><b>وب‌سایت</b><br><a href="https://alvandcode.github.io" target="_blank" rel="noopener">alvandcode.github.io</a></div>
+      <div class="mini"><b>تلگرام</b><br><a href="https://t.me/a_c_official" target="_blank" rel="noopener">@a_c_official</a></div>
+      <div class="mini"><b>گیت‌هاب</b><br><a href="https://github.com/Alvandcode/booka" target="_blank" rel="noopener">Alvandcode/booka</a></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  ساخته‌شده برای Booka — نسخه 0.1.0
+  <div class="links">
+    <a href="https://github.com/Alvandcode/booka" target="_blank" rel="noopener">گیت‌هاب پروژه</a>
+    <a href="https://github.com/Alvandcode/booka/releases/latest" target="_blank" rel="noopener">دانلود آخرین نسخه</a>
+    <a href="https://t.me/a_c_official" target="_blank" rel="noopener">کانال تلگرام</a>
+  </div>
+  <br><a class="top" href="#top">بازگشت به بالا</a>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  document.querySelectorAll('.code').forEach(function(box){
+    var btn = box.querySelector('.copy'), pre = box.querySelector('pre');
+    if(!btn || !pre) return;
+    btn.addEventListener('click', function(){
+      var txt = pre.innerText;
+      function done(){ btn.textContent = 'کپی شد'; setTimeout(function(){ btn.textContent = 'کپی'; }, 1500); }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(done).catch(function(){ fallback(); });
+      } else { fallback(); }
+      function fallback(){
+        var ta = document.createElement('textarea');
+        ta.value = txt; document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); }catch(e){}
+        document.body.removeChild(ta); done();
+      }
+    });
+  });
+  var links = Array.prototype.slice.call(document.querySelectorAll('#navlinks a'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        links.forEach(function(a){ a.classList.remove('active'); });
+        var a = map[en.target.id]; if(a) a.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px'});
+  ['install','start','epub','pdf','marks','leitner','dict','theme','backup','why','faq','support'].forEach(function(id){
+    var el = document.getElementById(id); if(el) obs.observe(el);
+  });
+})();
+</script>
+</body>
+</html>

@@ -31,6 +31,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # برای اجرای دستی باید همان تگ منتشر شود، نه نوک شاخه؛ وگرنه
+          # خروجی بیلد با تگ Release یکی نمی‌شود.
+          ref: ${{ github.event.inputs.tag || github.ref }}
+          fetch-tags: true
 
       - uses: actions/setup-java@v4
         with:
