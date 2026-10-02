@@ -1,115 +1,215 @@
-# Booka | بوکا
+# 📚 Booka
 
-[![Release](https://img.shields.io/github/v/release/Alvandcode/booka)](https://github.com/Alvandcode/booka/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-gold.svg)](LICENSE)
-[![Flutter](https://img.shields.io/badge/Flutter-3.47.5-blue.svg)](https://flutter.dev)
-[![Tutorial](https://img.shields.io/badge/Tutorial-آموزش قدم‌به‌قدم-gold.svg)](https://alvandcode.github.io/booka/tutorial.html)
+[![Stars](https://img.shields.io/github/stars/Alvandcode/booka?style=flat-square)](https://github.com/Alvandcode/booka/stargazers)
+[![Release](https://img.shields.io/github/actions/workflow/status/Alvandcode/booka/release.yml?style=flat-square&label=release)](https://github.com/Alvandcode/booka/actions)
+[![Flutter](https://img.shields.io/badge/Flutter-3.47.5-blue?style=flat-square)](https://flutter.dev)
+[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/Alvandcode/booka?style=flat-square)](https://github.com/Alvandcode/booka/commits)
 
-> **کتابخوان آفلاین PDF و EPUB** — انتخاب متن واقعی، هایلایت، دیکشنری آفلاین، لایتنر، بکاپ و خروجی خوانا. بدون حساب، بدون تبلیغ، بدون تحلیلگر و بدون اینترنت.
+> **EN:** Offline PDF & EPUB reader with real text selection, highlights, offline dictionary, SM-2 Leitner, backup and readable export. No account, no ads, no analytics, no internet.
+>
+> **FA:** کتابخوان آفلاین PDF و EPUB با انتخاب متن واقعی، هایلایت، دیکشنری آفلاین، لایتنر SM-2، بکاپ و خروجی خوانا. بدون حساب، تبلیغ، تحلیلگر و اینترنت.
 
-> **Offline PDF & EPUB reader** — real text selection, highlights, offline dictionary, Leitner, backup and readable export. No account, no ads, no analytics, no internet.
+<div dir="rtl" lang="fa">
 
-**شروع سریع / Quick links:** [دانلود آخرین نسخه](https://github.com/Alvandcode/booka/releases/latest) • [آموزش قدم‌به‌قدم](https://alvandcode.github.io/booka/tutorial.html) • [راهنمای نصب](docs/INSTALL.fa.md) • [حریم خصوصی داخل اپ](lib/privacy_page.dart) • [حمایت](#حمایت--support)
+## کتابخانه‌ات، همیشه همراهت — بدون اینترنت
+
+Booka برای یک کار ساخته شده: **خواندن کتاب روی گوشی، آفلاین و خصوصی**. PDF و EPUB را با کاور واقعی نشان می‌دهد، از همان‌جا که بودی ادامه می‌دهد، متن را هایلایت می‌کند، معنی کلمه را همان‌جا می‌گوید و واژه‌ها را با لایتنر در حافظه‌ات نگه می‌دارد.
+
+</div>
+
+<p align="center">
+  <a href="https://alvandcode.github.io/booka/tutorial.html"><b>🎓 آموزش قدم‌به‌قدم — کلیک کنید</b></a>
+  <br/>
+  <sub>Step-by-step tutorial — live page, or open <code>docs/tutorial.html</code> in your browser after cloning.</sub>
+</p>
 
 ---
 
-## فارسی
+## 🎓 Tutorial | آموزش تصویری
 
-### نصب
+**New here? Start with the visual step-by-step tutorial** (Persian): **[📖 Open the tutorial](https://alvandcode.github.io/booka/tutorial.html)** — after cloning you can also just open `docs/tutorial.html` in any browser.
 
-۱. از [آخرین Release](https://github.com/Alvandcode/booka/releases/latest) فایل را بگیرید:
-   - اگر معماری دستگاه را نمی‌دانید: `app-universal-release.apk` روی همه کار می‌کند ولی بزرگ‌تر است.
-   - برای دانلود کم‌حجم‌تر: بیشتر گوشی‌ها `app-arm64-v8a-release.apk`، گوشی‌های خیلی قدیمی `app-armeabi-v7a-release.apk`، شبیه‌ساز `app-x86_64-release.apk`.
-۲. نصب از منبع ناشناس را فقط برای همان مرورگر/فایل‌ساز روشن کنید.
-۳. همه نسخه‌ها با یک کلید دائمی امضا می‌شوند؛ نسخه جدید روی قبلی نصب می‌شود.
+<div dir="rtl" lang="fa">
 
-فایل یکپارچه `app-universal-release.apk` هم در همان صفحه هست. جزئیات کامل در [راهنمای نصب](docs/INSTALL.fa.md) و آموزش کامل در [صفحه آموزش](https://alvandcode.github.io/booka/tutorial.html) است.
+**تازه واردی؟ از آموزش تصویری شروع کن** (فارسی، قدم‌به‌قدم با تصویر): **[📖 باز کردن صفحه آموزش](https://alvandcode.github.io/booka/tutorial.html)** — آفلاین هم می‌توانی فایل `docs/tutorial.html` را بعد از کلون در مرورگر باز کنی.
 
-### قابلیت‌ها
+</div>
 
-- **کتابخانه PDF و EPUB** با کاور و نویسنده واقعی و ادامه مطالعه از آخرین موقعیت.
-- **EPUB:** حالت قالب‌بندی کامل و حالت متن ساده، فهرست مطالب سلسله‌مراتبی، جستجوی درون‌کتاب، نشان، هایلایت متن واقعی، کپی، دیکشنری، و کنترل اندازه فونت.
-- **PDF:** انتخاب متن، هایلایت متن واقعی، جستجوی درون‌کتاب، فهرست مطالب، نشان صفحه، و نمایش دوباره هایلایت ذخیره‌شده روی همان صفحه.
-- **تشخیص PDF اسکن‌شده:** اگر کتاب لایه متنی نداشته باشد، اپ هشدار «بدون لایه متنی» می‌دهد؛ جستجو و هایلایت متنی روی عکس جواب نمی‌دهد.
-- **نشان، هایلایت و لایتنر:** سه تب جدا با شمارش، جستجوی متن کامل در هایلایت‌ها، پرش به محل اصلی، و حذف.
-- **دیکشنری آفلاین انگلیسی→فارسی:** ۳۶٬۱۲۲ مدخل داخل خود اپ، با تحمل نشانه‌گذاری فارسی/عربی، ریشه‌یابی ساده، تلفظ با موتور گوشی، کپی معنی و ارسال مستقیم به لایتنر.
-- **لایتنر SM-2:** کارت واژه با معنی، جمله متن و نام کتاب؛ فقط کارت‌های سررسیده برای مرور روزانه؛ خروجی CSV سازگار با اکسل و Anki.
-- **تم و تایپوگرافی:** چهار تم کاغذی، سپیا، خاکستری شب و مشکی AMOLED با فونت وزیرمتن و اندازه فونت ۱۲ تا ۲۲.
-- **بکاپ و خروجی:** بکاپ کامل JSON با دو حالت افزودن بدون تکرار یا جایگزینی کامل؛ خروجی هایلایت و نشان به Markdown و واژگان به CSV. بکاپ فقط فراداده است، نه خود فایل کتاب.
-- **حریم خصوصی واقعی:** نسخه انتشار هیچ دسترسی اندروید نمی‌خواهد؛ بدون حساب، تبلیغ، تحلیلگر و اینترنت. با حذف اپ همه داده‌ها پاک می‌شود.
+---
 
-### چرا Booka با اپ‌های معمول فرق دارد؟
+## 📑 Contents | فهرست
 
-| موضوع | Booka | خیلی از اپ‌های فروشگاهی |
+- [🎓 Tutorial | آموزش تصویری](#-tutorial--آموزش-تصویری)
+- [✨ Features | قابلیت‌ها](#-features--قابلیتها)
+- [✅ Requirements | نیازها](#-requirements--نیازها)
+- [⚡ Quick Start | شروع سریع](#-quick-start--شروع-سریع)
+- [📖 EPUB Reader | ریدر EPUB](#-epub-reader--ریدر-epub)
+- [📄 PDF Reader | ریدر PDF](#-pdf-reader--ریدر-pdf)
+- [🔤 Dictionary | دیکشنری](#-dictionary--دیکشنری)
+- [🗂️ Leitner | لایتنر](#-leitner--لایتنر)
+- [💾 Backup & Export | بکاپ و خروجی](#-backup--export--بکاپ-و-خروجی)
+- [📊 Sample Export | نمونه خروجی](#-sample-export--نمونه-خروجی)
+- [🛡️ Privacy | حریم خصوصی](#-privacy--حریم-خصوصی)
+- [📁 Project Structure | ساختار پروژه](#-project-structure--ساختار-پروژه)
+- [🛠️ Development | توسعه](#-development--توسعه)
+- [🤝 Contributing | مشارکت](#-contributing--مشارکت)
+- [⭐ Support | حمایت](#-support--حمایت)
+- [📢 Contact | ارتباط](#-contact--ارتباط)
+- [📄 License | لایسنس](#-license--لایسنس)
+
+---
+
+## ✨ Features | قابلیت‌ها
+
+| | EN | FA |
 |---|---|---|
-| حریم خصوصی | بدون دسترسی، بدون حساب/تبلیغ/تحلیلگر/اینترنت | حساب، تبلیغ و ردیابی |
-| دیکشنری | آفلاین داخل اپ با تلفظ و ریشه‌یابی | آنلاین، جداگانه یا پولی |
-| یادگیری | لایتنر SM-2 که از همان متن کتاب کارت می‌سازد | هایلایت جدا از مرور واژه |
-| خروجی داده | JSON کامل به‌علاوه Markdown و CSV خوانا | قفل داده داخل اپ |
-| PDF | متن واقعی، جستجو، فهرست و تشخیص اسکن‌شده | فقط ورق‌زدن |
-| بروزرسانی | کلید امضای دائمی؛ نصب روی نسخه قبلی | امضای ناپایدار و نصب دوباره |
-
-### حمایت / Support
-
-اگر از اپ خوشت آمد، یک تراکنش کوچک Ton برام بفرست. ممنونم!
-
-- آدرس کیف پول Ton: `UQCB9rzvwmq0FJDaBkHVdBgbfZPb06FWdKco3woAHH6AXuUt`
-- وب‌سایت: [alvandcode.github.io](https://alvandcode.github.io)
-- تلگرام: [@a_c_official](https://t.me/a_c_official)
-- گیت‌هاب: [Alvandcode/booka](https://github.com/Alvandcode/booka)
+| 📚 | **PDF & EPUB library** with real covers, authors, resume-from-last-position | **کتابخانه PDF و EPUB** با کاور و نویسنده واقعی و ادامه از آخرین موقعیت |
+| 📄 | **Real PDF text**: selection, in-book search, outline, visible highlights (PDFium) | **متن واقعی PDF**: انتخاب، جستجوی درون‌کتاب، فهرست و هایلایت قابل دیدن (موتور PDFium) |
+| 📖 | **EPUB rich + plain modes**, hierarchical TOC, search, font size 12–22 | **دو حالت قالب‌بندی و ساده**، فهرست سلسله‌مراتبی، جستجو و فونت ۱۲ تا ۲۲ |
+| 🔖 | **Bookmarks & highlights** with full-text search, jump-to-source, delete | **نشان و هایلایت** با جستجوی متن کامل، پرش به محل اصلی و حذف |
+| 🔤 | **Offline EN→FA dictionary**: 36,122 entries, stemming, device TTS, one-tap Leitner cards | **دیکشنری آفلاین**: ۳۶٬۱۲۲ مدخل، ریشه‌یابی، تلفظ و ساخت کارت لایتنر |
+| 🗂️ | **SM-2 Leitner**: due-only daily review, Excel/Anki CSV export | **لایتنر SM-2**: مرور روزانه فقط سررسیده‌ها، خروجی CSV |
+| 🎨 | **4 themes** (paper, sepia, grey night, AMOLED) + Vazirmatn typography | **۴ تم** (کاغذی، سپیا، خاکستری شب، AMOLED) با فونت وزیرمتن |
+| 💾 | **Backup & export**: full JSON (merge or replace) + readable Markdown/CSV | **بکاپ و خروجی**: JSON کامل (ادغام یا جایگزینی) + Markdown و CSV خوانا |
+| 🛡️ | **Zero permissions** in release; no account, ads, analytics or internet | **صفر دسترسی** در نسخه انتشار؛ بدون حساب، تبلیغ، تحلیلگر و اینترنت |
 
 ---
 
-## English
+## ✅ Requirements | نیازها
 
-### Install
+**EN:** Android **7.0+**, ~30 MB free for a per-ABI APK (~80 MB for the universal one). No internet needed. For pronunciation, any on-device speech engine (e.g. Google Text-to-Speech).
 
-1. From [latest Release](https://github.com/Alvandcode/booka/releases/latest), pick an APK:
-   - Unsure about your device: `app-universal-release.apk` works everywhere but is bigger.
-   - For a smaller download: most modern phones take `app-arm64-v8a-release.apk`, very old 32-bit phones `app-armeabi-v7a-release.apk`, x86_64 emulator `app-x86_64-release.apk`.
-2. Enable “Install unknown apps” only for the browser/file manager you download with.
-3. Every release is signed with one permanent key, so updates install over the previous version.
+<div dir="rtl" lang="fa">
 
-A universal `app-universal-release.apk` is also on the same page. See [install guide](docs/INSTALL.fa.md) and the [step-by-step tutorial](https://alvandcode.github.io/booka/tutorial.html).
+**FA:** اندروید **۷ به بالا**، حدود ۳۰ مگ فضای خالی برای نسخه مخصوص معماری (حدود ۸۰ مگ برای نسخه یکپارچه). بدون نیاز به اینترنت. برای تلفظ کلمات، هر موتور گفتار روی گوشی کافی است.
 
-### Features
-
-- **PDF & EPUB library** with real covers/authors and resume-from-last-position.
-- **EPUB:** full rich-text mode plus plain-text mode, hierarchical TOC, in-book search, bookmarks, real-text highlights, copy, dictionary, and font-size controls.
-- **PDF:** real text selection and highlights, in-book search, document outline, page bookmarks, and stored highlights re-shown on their page.
-- **Scanned-PDF detection:** if a PDF has no text layer, the app says so; text search/highlight/dictionary cannot work on images.
-- **Bookmarks, highlights, Leitner:** three counted tabs, full-text highlight search, jump-to-source, delete.
-- **Offline English→Persian dictionary:** 36,122 bundled entries, punctuation-tolerant lookup, simple stemming, device TTS pronunciation, copy, and one-tap Leitner cards.
-- **SM-2 Leitner:** word cards with meaning, source sentence and book; daily due review; Excel/Anki-compatible CSV export.
-- **Themes & typography:** paper, sepia, grey night and true-black AMOLED themes with Vazirmatn and 12–22 reader font size.
-- **Backup & export:** full JSON backup with merge-without-duplicates or full-replace restore; highlights/bookmarks to Markdown and vocabulary to CSV. Backup stores metadata only, not book files.
-- **Real privacy:** the release build requests no Android permissions; no account, ads, analytics or internet. Uninstall wipes everything.
-
-### Why Booka is different
-
-| Area | Booka | Many store readers |
-|---|---|---|
-| Privacy | No permissions, no account/ads/analytics/internet | Accounts, ads, tracking |
-| Dictionary | Bundled offline with pronunciation and stemming | Online, separate or paid |
-| Learning | SM-2 Leitner cards created from the text you read | Highlights disconnected from review |
-| Data export | Full JSON plus readable Markdown and CSV | Locked-in data |
-| PDF | Real text, search, outline and scan detection | Page-flipping only |
-| Updates | One permanent signing key; clean in-place upgrades | Unstable signatures and reinstalls |
-
-### Support
-
-If you like the app, send a small Ton transaction. Thank you!
-
-- TON wallet: `UQCB9rzvwmq0FJDaBkHVdBgbfZPb06FWdKco3woAHH6AXuUt`
-- Website: [alvandcode.github.io](https://alvandcode.github.io)
-- Telegram: [@a_c_official](https://t.me/a_c_official)
-- GitHub: [Alvandcode/booka](https://github.com/Alvandcode/booka)
+</div>
 
 ---
 
-## معماری / Architecture
+## ⚡ Quick Start | شروع سریع
 
+**EN:** Grab the APK from [latest Release](https://github.com/Alvandcode/booka/releases/latest) — `app-universal-release.apk` works on every device; per-ABI files (`app-arm64-v8a-release.apk` for most phones) are smaller:
+
+```bash
+# verify what you downloaded (compare with checksums.txt on the release page)
+sha256sum app-universal-release.apk
 ```
+
+Then install (enable “Install unknown apps” for your browser when asked), open the app and add your first PDF or EPUB. That’s it — everything works offline from here.
+
+<div dir="rtl" lang="fa">
+
+**FA:** از [آخرین Release](https://github.com/Alvandcode/booka/releases/latest) فایل را بگیر — `app-universal-release.apk` روی همه دستگاه‌ها کار می‌کند؛ فایل مخصوص معماری (برای بیشتر گوشی‌ها `app-arm64-v8a-release.apk`) کم‌حجم‌تر است. موقع نصب، «نصب از منبع ناشناس» را فقط برای همان مرورگر روشن کن، بعد اولین PDF یا EPUB را وارد کن. از اینجا به بعد همه‌چیز آفلاین است.
+
+```bash
+# بررسی اصالت فایل (با checksums.txt همان صفحه مقایسه کن)
+sha256sum app-universal-release.apk
+```
+
+</div>
+
+---
+
+## 📖 EPUB Reader | ریدر EPUB
+
+**EN:** Two modes — **rich** (the book’s own formatting, images and CSS) and **plain** (just the text). Hierarchical outline with jump-to-section, in-book search with surrounding-text snippets, bookmarks, real-text highlights, copy, and dictionary on any selection. Font size lives right in the reader bar (12–22, also in Settings).
+
+<div dir="rtl" lang="fa">
+
+**FA:** دو حالت دارد — **کامل** (قالب‌بندی، تصویر و استایل خود کتاب) و **ساده** (فقط متن). فهرست سلسله‌مراتبی با پرش، جستجوی درون‌کتاب با برش متن، نشان، هایلایت متن واقعی، کپی و دیکشنری روی هر انتخاب. اندازه فونت همان‌جا در نوار ریدر است (۱۲ تا ۲۲، در تنظیمات هم هست).
+
+</div>
+
+---
+
+## 📄 PDF Reader | ریدر PDF
+
+**EN:** Real text selection (PDFium engine) — select to get **dictionary**, **highlight** and **copy**. In-book search runs after a short pause so big books stay fast; the outline jumps you between chapters; **My Highlights** lists this book’s highlights and paints the tapped one back onto its page. Scanned (image-only) PDFs are detected and labeled — text features can’t work on photos, and the app tells you instead of failing silently.
+
+<div dir="rtl" lang="fa">
+
+**FA:** انتخاب متن واقعی (موتور PDFium) — با انتخاب، سه دکمه **دیکشنری**، **هایلایت** و **کپی** می‌آید. جستجو با کمی مکث اجرا می‌شود تا کتاب‌های بزرگ کند نشوند؛ فهرست مطالب بین فصل‌ها می‌پرد؛ **هایلایت‌های من** هایلایت‌های همین کتاب را فهرست می‌کند و با لمس، همان متن را روی صفحه زرد می‌کند. PDF اسکن‌شده (فقط عکس) تشخیص داده و برچسب می‌خورد — قابلیت‌های متنی روی عکس جواب نمی‌دهند و اپ به‌جای سکوت، این را می‌گوید.
+
+</div>
+
+---
+
+## 🔤 Dictionary | دیکشنری
+
+**EN:** Fully offline English→Persian, **36,122 entries** bundled (~1.6 MB). Tolerant lookup — strips Persian/Arabic punctuation, collapses spaces, tries simple stems (`-s/-es/-ing/-ed`). Pronunciation uses your device’s own speech engine (the button hides itself if none is installed). Copy the meaning or send the word straight to Leitner with its sentence and book attached.
+
+<div dir="rtl" lang="fa">
+
+**FA:** کاملاً آفلاین انگلیسی‌به‌فارسی با **۳۶٬۱۲۲ مدخل** داخل خود اپ (حدود ۱.۶ مگ). جستجو خطاپذیر است — نشانه‌های فارسی/عربی را تمیز می‌کند و ریشه ساده را هم امتحان می‌کند. تلفظ با موتور گفتار خود گوشی است (اگر نباشد دکمه‌اش پنهان می‌شود). معنی را کپی کن یا واژه را با جمله و نام کتاب مستقیم به لایتنر بفرست.
+
+</div>
+
+---
+
+## 🗂️ Leitner | لایتنر
+
+**EN:** Cards are born from your reading — word, meaning, source sentence, book. Each day only the **due** cards show up. Grading a card (0 = forgotten … 5 = mastered) reschedules it with the classic **SM-2** rule: forget → back to 1 day; 1st success → 1 day, 2nd → 6 days, then interval × easiness; easiness itself moves with the standard SM-2 formula, clamped to 1.3–2.8.
+
+<div dir="rtl" lang="fa">
+
+**FA:** کارت‌ها از دل مطالعه تو ساخته می‌شوند — واژه، معنی، جمله متن و نام کتاب. هر روز فقط کارت‌های **سررسیده** می‌آیند. نمره‌دادن (۰ یعنی فراموش … ۵ یعنی مسلط) زمان بعدی را با قانون کلاسیک **SM-2** تنظیم می‌کند: فراموشی یعنی برگشت به یک روز؛ موفقیت اول یک روز، دوم شش روز، بعد فاصله × ضریب سهولت؛ خود ضریب هم با فرمول استاندارد SM-2 و در بازه ۱.۳ تا ۲.۸ حرکت می‌کند.
+
+</div>
+
+---
+
+## 💾 Backup & Export | بکاپ و خروجی
+
+**EN:** One JSON file holds everything — books, bookmarks, highlights, Leitner. Restore **merges** (duplicates skipped) or **replaces** everything after confirmation. On a new device, import your books first: backup matches them by file name, orphaned records are kept as metadata. For humans: highlights and bookmarks export to **Markdown**, vocabulary to Excel/Anki-friendly **CSV**. Backup never includes the book files themselves.
+
+<div dir="rtl" lang="fa">
+
+**FA:** یک فایل JSON همه‌چیز را نگه می‌دارد — کتاب‌ها، نشان‌ها، هایلایت‌ها و لایتنر. بازیابی یا **ادغام** می‌کند (تکراری‌ها رد می‌شوند) یا بعد از تأیید **جایگزین** کامل می‌شود. در گوشی جدید اول کتاب‌ها را وارد کن: بکاپ با نام فایل به کتاب وصل می‌شود و رکورد بی‌کتاب هم به‌عنوان فراداده می‌ماند. برای آدم‌ها: هایلایت و نشان به **Markdown** و واژگان به **CSV** سازگار با اکسل و Anki خروجی می‌رود. بکاپ هیچ‌وقت خود فایل کتاب را ندارد.
+
+</div>
+
+---
+
+## 📊 Sample Export | نمونه خروجی
+
+```markdown
+# هایلایت‌ها
+
+> 2 مورد • booka-backup
+
+## Book Title
+
+- «Persistence is a virtue …» — بخش 3
+  - یادداشت: برای مرور هفتگی
+```
+
+```csv
+front,back,book,context,interval,due,easiness
+persistence,پشتکار,Book Title,Persistence is a virtue …,6,2026-10-08,2.50
+```
+
+**EN:** Highlights/bookmarks export to Markdown grouped by book; vocabulary exports to CSV with BOM so Excel opens Persian correctly.
+
+<div dir="rtl" lang="fa">
+
+**FA:** هایلایت و نشان به Markdown گروه‌بندی‌شده بر اساس کتاب خروجی می‌روند؛ واژگان به CSV با BOM می‌رود تا اکسل فارسی را درست باز کند.
+
+</div>
+
+---
+
+## 🛡️ Privacy | حریم خصوصی
+
+- **EN:** The release build requests **zero Android permissions** — no INTERNET, no storage, nothing. No account, no ads, no analytics. The dictionary lives inside the app; no word ever leaves your device. Pronunciation runs on your OS speech engine. Deleting the app wipes everything — back up first from Settings.
+- **FA:** نسخه انتشار **هیچ دسترسی اندروید** نمی‌خواهد — نه اینترنت، نه حافظه، هیچ‌چیز. بدون حساب، تبلیغ و تحلیلگر. دیکشنری داخل خود اپ است؛ هیچ کلمه‌ای به جایی ارسال نمی‌شود. تلفظ با موتور خود سیستم‌عامل است. با حذف اپ همه‌چیز پاک می‌شود — اول از تنظیمات بکاپ بگیر.
+
+---
+
+## 📁 Project Structure | ساختار پروژه
+
+```text
 lib/
   main.dart                 صفحات و ناوبری
   app_info.dart             نام و نسخه اپ (منبع واحد)
@@ -118,7 +218,7 @@ lib/
   privacy_page.dart
   data/
     db.dart                 اسکیمای SQLite و مهاجرت
-    dao.dart                 همه کوئری‌ها
+    dao.dart                 همه کوئری‌ها (+ گام SM-2)
     models.dart              مدل‌های داده، بدون codegen
     store.dart               providerهای Riverpod و مهاجرت داده
     backup.dart              قالب بکاپ و اکسپورت
@@ -129,147 +229,93 @@ lib/
     epub_screen.dart
     pdf_screen.dart
     pdf_text.dart            ابزار متن، جستجو و TOC مسطح‌شده
-  dictionary/
-  theme/
+  dictionary/               دیکشنری آفلاین + تلفظ + لایتنر
+  theme/                    چهار تم و فونت وزیرمتن
+test/                      168 tests (flutter test)
+.github/workflows/release.yml   تگ → تست → امضا → انتشار
 ```
-
-لایه داده روی SQLite است و همه کوئری‌ها در `dao.dart` متمرکزند. مدل‌ها کلاس‌های ساده Dart هستند و هیچ مرحله codegen ندارند.
-
-## توسعه / Development
 
 ```bash
 flutter pub get
-flutter run
-flutter test
-flutter analyze
+flutter test      # 168 tests
+flutter analyze   # clean: 0 errors, 0 warnings
 ```
 
-اگر `pub get` به خطای دسترسی خورد:
+---
+
+## 🛠️ Development | توسعه
+
+**EN:** Built with **Flutter 3.47.5** (Dart 3.13). Data layer is SQLite with all queries in `dao.dart`; plain-Dart models, no codegen; Riverpod providers. PDF engine is PDFium via `pdfrx`; EPUB via `epub_plus`.
+
+Releases are fully automatic: bump `version` in `pubspec.yaml` **and** `lib/app_info.dart`, then tag:
 
 ```bash
-# ویندوز پاورشل
-$env:PUB_HOSTED_URL = "https://pub.flutter-io.cn"
+git tag v0.1.2
+git push origin v0.1.2
 ```
 
-`dependency_overrides` در `pubspec.yaml` عمدی است: `epub_plus` روی `image 3` و `archive 3` قفل است ولی موتور `pdfrx` به `image 4` و `archive 4` نیاز دارد؛ تنها API مشترک `ZipDecoder().decodeBytes` در هر دو نسخه هست و تست‌ها آن را پوشش می‌دهند.
+CI (`.github/workflows/release.yml`) checks out that tag, runs analyze + tests, signs with the permanent key from Secrets (`BOOKA_KEYSTORE_BASE64`, `BOOKA_STORE_PASSWORD`, `BOOKA_KEY_PASSWORD`, `BOOKA_KEY_ALIAS`) and publishes split APKs + universal APK + App Bundle to Releases. If secrets are missing, the job stops loudly instead of shipping a wrongly-signed build.
 
-## انتشار اندروید / Android release
+<div dir="rtl" lang="fa">
 
-اپ در فروشگاه نیست. خروجی با امضای مستقیم در صفحه Releases همین ریپو منتشر می‌شود. راهنمای نصب برای کاربران در [docs/INSTALL.fa.md](docs/INSTALL.fa.md) و آموزش کامل در [صفحه آموزش](https://alvandcode.github.io/booka/tutorial.html) است.
+**FA:** ساخته‌شده با **فلاتر 3.47.5** (دارت 3.13). لایه داده SQLite است و همه کوئری‌ها در `dao.dart`؛ مدل‌ها کلاس ساده دارت بدون codegen؛ موتور PDF با PDFium و EPUB با `epub_plus`. انتشار کاملاً خودکار است: نسخه را در `pubspec.yaml` **و** `lib/app_info.dart` بالا ببر و تگ بزن؛ CI همان تگ را checkout می‌کند، تست می‌گیرد، با کلید دائمی امضا می‌کند و در Releases می‌گذارد.
 
-### کلید امضا / Signing key
+</div>
 
-کلید از قبل ساخته شده و **یک بار برای همیشه** استفاده می‌شود. همین نکته باعث می‌شود نسخه جدید روی نسخه قبلی نصب شود و کاربر مجبور به حذف و نصب دوباره نشود.
+---
 
-| | |
-|---|---|
-| محل کلید | `~/.booka/booka-release.jks` (خارج از ریپو) |
-| اطلاعات و رمز | `~/.booka/credentials.txt` |
-| اعتبار گواهی | تا سال ۲۰۵۴ |
-| الگوریتم | RSA 4096 / SHA256withRSA |
+## 🤝 Contributing | مشارکت
 
-> **این کلید را گم نکن.** اگر کلید یا رمزش را از دست بدهی، دیگر نمی‌توانی نسخه‌ای منتشر کنی که روی نصب‌های موجود کاربران نصب شود؛ مجبور می‌شوی `applicationId` را عوض کنی و اپ را از نو منتشر کنی. از هر دو فایل پشتیبان بگیر و در جای امن نگه دار.
+**EN:** Issues and Pull Requests are welcome! Bug reports with repro steps get fixed fastest. Please keep the app’s promise: offline-first, zero permissions, no tracking.
 
-### انتشار محلی / Local release
+<div dir="rtl" lang="fa">
 
-```bash
-flutter build apk --release --split-per-abi
-flutter build appbundle --release
-```
+**FA:** ایشو و پول‌ریکوئست همیشه خوش‌آمد است! گزارش باگ با قدم‌های بازتولید سریع‌تر فیکس می‌شود. لطفاً قول اپ را نگه دار: آفلاین‌اول، صفر دسترسی، بدون ردیابی.
 
-`android/key.properties` به کلید اشاره می‌کند و در git نیست. اگر نبود، بیلد با کلید debug انجام می‌شود و هشدار چاپ می‌کند که خروجی قابل انتشار نیست.
+</div>
 
-### انتشار خودکار / CI release
+---
 
-`.github/workflows/release.yml` با زدن تگ، همان تگ را checkout می‌کند، تست می‌کند، با کلید واقعی امضا می‌کند و در صفحه Releases قرار می‌دهد.
+## ⭐ Support | حمایت
 
-```bash
-# در pubspec.yaml نسخه را بالا ببر، مثلاً version: 0.2.0+2
-git tag v0.2.0
-git push origin v0.2.0
-```
+**EN:** If Booka earned a place on your phone, support it:
 
-برای اینکه CI بتواند امضا کند، یک‌بار این secretها را در `Settings → Secrets and variables → Actions` اضافه کن:
+- ⭐ **Star the repo** — it keeps the project alive and visible
+- 📣 **Share it** with anyone who reads on their phone
+- 🐛 **Report bugs & ideas** via Issues — every report makes it better
+- 💎 **Donate a little TON** — wallet below. Thank you!
 
-| نام | مقدار |
-|---|---|
-| `BOOKA_KEYSTORE_BASE64` | خروجی `base64 -w0 ~/.booka/booka-release.jks` |
-| `BOOKA_STORE_PASSWORD` | رمز انبار کلید |
-| `BOOKA_KEY_PASSWORD` | رمز کلید |
-| `BOOKA_KEY_ALIAS` | `booka` |
+<div dir="rtl" lang="fa">
 
-اگر این secretها تنظیم نشده باشند، بیلد با پیام روشن متوقف می‌شود تا نسخه‌ای با امضای اشتباه منتشر نشود.
+**FA:** اگر بوکا جایی در گوشی‌ات باز کرد، حمایتش کن:
 
-### بالا بردن نسخه / Versioning
+- ⭐ **به ریپو ستاره بده** — همین ستاره انگیزه ادامه و دیده‌شدن پروژه است
+- 📣 **با بقیه به اشتراک بذار** — هر کسی که روی گوشی کتاب می‌خواند
+- 🐛 **باگ و ایده را ایشو کن** — هر گزارش، پروژه را بهتر می‌کند
+- 💎 اگر خوشت آمد، یک تراکنش کوچک Ton بفرست. ممنونم! آدرس کیف پول: `UQCB9rzvwmq0FJDaBkHVdBgbfZPb06FWdKco3woAHH6AXuUt`
 
-نسخه را در `pubspec.yaml` عوض کن و همان را در `lib/app_info.dart` به‌روز کن تا داخل اپ هم درست نمایش داده شود.
+</div>
 
-## انتشار iOS / iOS
+---
 
-نیازمند macOS و Xcode:
+## 📢 Contact | ارتباط
 
-```bash
-flutter build ipa --release
-```
+- 💬 Telegram channel: **[@a_c_official](https://t.me/a_c_official)** — news, updates and support
+- 🌐 Website: [alvandcode.github.io](https://alvandcode.github.io)
+- 💻 GitHub: [Alvandcode/booka](https://github.com/Alvandcode/booka)
 
-پیش از اولین انتشار، `PRODUCT_BUNDLE_IDENTIFIER` را در `ios/Runner.xcodeproj` روی یک شناسه یکتا تنظیم کن و در حساب توسعه‌دهنده اپ ثبتش کن.
+<div dir="rtl" lang="fa">
 
-## وب / Web
+- 💬 کانال تلگرام: **[@a_c_official](https://t.me/a_c_official)** — اخبار، آپدیت‌ها و پشتیبانی
+- 🌐 وب‌سایت: [alvandcode.github.io](https://alvandcode.github.io)
+- 💻 گیت‌هاب: [Alvandcode/booka](https://github.com/Alvandcode/booka)
 
-نسخه وب پشتیبانی نمی‌شود چون کد اپ از `dart:io` برای فایل و دیتابیس استفاده می‌کند؛ پس `flutter build web` فعلاً مسیر انتشار نیست.
+</div>
 
-## وضعیت زنجیره ابزار / Toolchain
+---
 
-| مؤلفه | نسخه | چرا |
-|---|---|---|
-| Flutter | 3.47.5 | نسخه پایدار فعلی |
-| Gradle | 9.4.1 | حداقلی که AGP 9.2 می‌خواهد |
-| AGP | 9.2.0 | سقف پشتیبانی‌شده در Flutter 3.47 |
-| Kotlin | 2.4.0 | نسخه‌ای که Flutter پیشنهاد می‌کند |
-| JDK | 17 | |
-| NDK | 25.2.9519653 | نسخه نصب‌شده روی این ماشین |
+## 📄 License | لایسنس
 
-### دو نکته که ممکن است تعجب‌آور باشند
+MIT — see [LICENSE](./LICENSE). Vazirmatn font: SIL Open Font License 1.1 (`assets/fonts/OFL.txt`).
 
-**NDK روی ۲۵.۲ ثابت شده، نه ۲۸.۲.** فلاتر پیشنهاد می‌دهد `28.2.13676358`، ولی دانلود آن از `dl.google.com` روی این شبکه ناموفق است. برای کامپایل بومی پلاگین‌ها ۲۵.۲ کافی است. اگر روزی لازم شد، فقط مقدار `ndkVersion` را در `android/app/build.gradle` تغییر بده.
-
-**`file_picker` به نسخه ۱۳ ارتقا کرد.** نسخه ۸ در buildscript خودش `com.android.tools.build:gradle:7.4.2` اعلام می‌کرد که با Gradle 9 سازگار نیست. نسخه ۱۳ این مشکل را ندارد، ولی API عوض شده بود (`FilePicker.platform.pickFiles` → `FilePicker.pickFiles`) و در `lib/main.dart` و `lib/export_page.dart` به‌روزرسانی شد.
-
-### آینه‌های مخزن / Mirrors
-
-`dl.google.com` روی این ماشین کند و گاهی ناموفق است. فایل `~/.gradle/init.d/00-mirrors-only.gradle` آینه‌های لازم را اضافه می‌کند. این فایل **هیچ نسخه‌ای را قفل نمی‌کند**، فقط مخازن را عوض می‌کند. چون artifactهای AGP فقط در آینه `google` هستند، ترتیب پیشنهادی این است:
-
-```groovy
-settingsEvaluated { settings ->
-    settings.pluginManagement {
-        repositories {
-            maven { url 'https://maven.aliyun.com/repository/google' }
-            maven { url 'https://maven.aliyun.com/repository/central' }
-            maven { url 'https://maven.aliyun.com/repository/public' }
-            maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-            google()
-            mavenCentral()
-            gradlePluginPortal()
-        }
-    }
-}
-
-allprojects {
-    buildscript {
-        repositories {
-            maven { url 'https://maven.aliyun.com/repository/google' }
-            maven { url 'https://maven.aliyun.com/repository/central' }
-            maven { url 'https://maven.aliyun.com/repository/public' }
-            google()
-            mavenCentral()
-        }
-    }
-}
-```
-
-> بلوک `dependencyResolutionManagement` در `settings.gradle` عمداً وجود ندارد؛ با مخازنی که init script اضافه می‌کند تضاد پیدا می‌کند.
-
-## مجوز / License
-
-- کد: MIT (متن کامل در [LICENSE](LICENSE))
-- فونت Vazirmatn: SIL Open Font License 1.1 (متن کامل در `assets/fonts/OFL.txt`)
+👨‍💻 Built for offline reading. / ساخته‌شده برای مطالعه آفلاین.
