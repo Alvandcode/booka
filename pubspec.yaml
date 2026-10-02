@@ -1,7 +1,7 @@
 name: book_reader_app
 description: "کتابخوان آفلاین PDF و EPUB - Paper & Glass"
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.1.1+2
 
 environment:
   # flutter_widget_from_html_core حداقل Dart 3.4 و Flutter 3.22 می‌خواهد

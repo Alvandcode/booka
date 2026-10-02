@@ -116,6 +116,14 @@ jobs:
       - name: ساخت APK
         run: flutter build apk --release --split-per-abi
 
+      - name: ساخت APK یکپارچه
+        # برای کاربرانی که معماری گوشی را نمی‌دانند؛ با همان امضای
+        # دائمی و در همان درخت ساخته می‌شود.
+        run: |
+          flutter build apk --release
+          mv build/app/outputs/flutter-apk/app-release.apk \
+             build/app/outputs/flutter-apk/app-universal-release.apk
+
       - name: ساخت App Bundle برای فروشگاه
         # بلوک splits.abi از android/app/build.gradle حذف شد، چون با
         # ساخت App Bundle ناسازگار بود و AGP اجازه نمی‌داد هر دو خروجی از
