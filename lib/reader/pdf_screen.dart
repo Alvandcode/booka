@@ -81,6 +81,13 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
     _open();
   }
 
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _searcher?.dispose();
+    super.dispose();
+  }
+
   Future<void> _open() async {
     try {
       final doc = await _ref.loadDocument((_, [__]) {});
@@ -90,13 +97,22 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
         _total = doc.pages.length;
         _page = _resolveStart();
       });
-      // جستجوگر بعد از لود شدن سند ساخته می‌شود تا به همان سند وصل باشد
-      _searcher = PdfTextSearcher(_controller);
       unawaited(_loadOutline(doc));
       unawaited(_probeTextLayer(doc));
     } catch (e) {
-      if (mounted) setState(() => _error = 'خطا در باز کردن PDF: $e');
+      if (mounted) setState(() => _error = _friendlyOpenError(e));
     }
+  }
+
+  /// پیام قابل فهم برای کاربر به‌جای متن خام انگلیسی موتور.
+  static String _friendlyOpenError(Object e) {
+    if (e is PdfPasswordException) {
+      return 'این فایل با رمز محافظت شده است و فعلاً باز کردن فایل رمزشده پشتیبانی نمی‌شود.';
+    }
+    if (e is PdfException) {
+      return 'این فایل خراب است یا PDF معتبر نیست و باز نمی‌شود.';
+    }
+    return 'خطا در باز کردن PDF. اگر فایل را جابه‌جا کرده‌ای، یک‌بار دیگر آن را وارد کن.';
   }
 
   /// نقطه شروع: نشان صریح، موقعیت ذخیره‌شده، یا اول
@@ -691,6 +707,14 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
                 sizeDelegateProvider:
                     const PdfViewerSizeDelegateProviderLegacy(maxScale: 6),
                 onPageChanged: _onPageChanged,
+                // جستجوگر فقط وقتی ساخته می‌شود که viewer واقعاً آماده
+                // باشد؛ ساختن زودتر (مثلاً همان لحظه لود سند) چون کنترلر
+                // هنوز به viewer وصل نیست، با خطای null می‌ترکد.
+                onViewerReady: (document, controller) {
+                  if (!mounted) return;
+                  _searcher?.dispose();
+                  _searcher = PdfTextSearcher(controller);
+                },
                 textSelectionParams: PdfTextSelectionParams(
                   enabled: true,
                   showContextMenuAutomatically: true,
