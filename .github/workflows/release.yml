@@ -48,12 +48,14 @@ jobs:
           flutter-version: '3.47.5'
           cache: true
 
-      - name: نصب CMake برای موتور PDF
-        # موتور PDF (pdfium) از native assets استفاده می‌کند و بیلد APK
-        # بدون CMake با خطای «CMake was not found in SDK» شکست می‌خورد.
+      - name: نصب CMake و NDK
+        # موتور PDF (pdfium) از native assets استفاده می‌کند و بدون CMake
+        # بیلد با خطای «CMake was not found in SDK» شکست می‌خورد؛ ماژول
+        # بومی `:jni` (وابسته transitive از path_provider_android) هم NDK
+        # می‌خواهد. نسخه‌ها دقیقاً همان‌هایی هستند که محلی جواب داده‌اند.
         # روی runner اوبونتو نه sdkmanager روی PATH است و نه لزوماً
         # ANDROID_HOME تنظیم شده، پس مسیر SDK را پیدا می‌کنیم و اول
-        # بررسی می‌کنیم که شاید از قبل نصب باشد.
+        # بررسی می‌کنیم که شاید از قبل نصب باشند.
         run: |
           set -uo pipefail
           SDK_ROOT=""
@@ -71,14 +73,18 @@ jobs:
             echo "::error::sdkmanager پیدا نشد"
             exit 1
           fi
-          if "$SDKMANAGER" --list_installed | grep -q "cmake;3.22.1"; then
-            echo "cmake;3.22.1 از قبل نصب است."
-          else
-            yes | "$SDKMANAGER" "cmake;3.22.1" || true
-            "$SDKMANAGER" --list_installed | grep -q "cmake;3.22.1" \
-              || { echo "::error::نصب cmake ناموفق بود"; exit 1; }
-            echo "cmake;3.22.1 نصب شد."
-          fi
+          ensure_pkg() {
+            if "$SDKMANAGER" --list_installed | grep -q "$1"; then
+              echo "$1 از قبل نصب است."
+            else
+              yes | "$SDKMANAGER" "$1" || true
+              "$SDKMANAGER" --list_installed | grep -q "$1" \
+                || { echo "::error::نصب $1 ناموفق بود"; exit 1; }
+              echo "$1 نصب شد."
+            fi
+          }
+          ensure_pkg "cmake;3.22.1"
+          ensure_pkg "ndk;25.2.9519653"
 
       - name: بازیابی کلید امضا
         id: keystore
