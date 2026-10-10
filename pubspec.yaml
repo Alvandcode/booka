@@ -23,6 +23,11 @@ dependencies:
   meta: ^1.15.0
   path: ^1.9.0
   path_provider: ^2.1.2
+  # پین عمدی به 2.2.15: نسخه‌های 2.3 به بعد به پکیج dart_lang/jni وابسته‌اند
+  # که ماژول بومی `:jni` را با ndkVersion برابر نسخه پیشنهادی فلاتر (۲۸.۲)
+  # می‌آورد؛ آن NDK نه محلی قابل دانلود است نه لازم — 2.2.15 همان نسخه‌ای
+  # است که با آن v0.1.0 تا v0.1.2 سبز منتشر شدند.
+  path_provider_android: 2.2.15
   shared_preferences: ^2.2.3
   sqflite: ^2.3.0
   flutter_widget_from_html_core: ^0.16.1
