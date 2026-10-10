@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdfrx/pdfrx.dart';
 
 import '../data/store.dart';
 import '../dictionary/dictionary_sheet.dart';
+import '../ocr/ocr_service.dart';
+import '../ocr/ocr_text.dart';
 import 'pdf_text.dart';
 
 /// ریدر PDF بر پایه pdfrx — انتخاب متن، هایلایت واقعی، جستجو، دیکشنری
@@ -75,10 +79,51 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
   /// متن صفحاتی که خوانده شده — جستجو را تکراری نکند
   final Map<int, String> _textCache = {};
 
+  /// موتور OCR — تنبل و بدون حالت؛ کش فایلی حالت را نگه می‌دارد.
+  final OcrService _ocrService = OcrService();
+
+  /// کلید کش OCR از روی مسیر و اندازه فایل؛ در initState ساخته می‌شود
+  /// تا probe هم از همان اول به کش فایلی دسترسی داشته باشد.
+  String _bookKey = '';
+
+  /// پوشه کش OCR — یک‌بار ساخته و نگه داشته می‌شود.
+  Future<Directory>? _ocrDirFuture;
+  Future<Directory> _ocrCacheDir() =>
+      _ocrDirFuture ??= _makeOcrCacheDir();
+
+  static Future<Directory> _makeOcrCacheDir() async {
+    final base = await getApplicationDocumentsDirectory();
+    final dir = Directory('${base.path}/ocr');
+    try {
+      await dir.create(recursive: true);
+    } catch (_) {}
+    return dir;
+  }
+
+  /// وضعیت اجرای OCR دسته‌ای روی همه صفحات.
+  bool _ocrRunning = false;
+  int _ocrDone = 0;
+  bool _ocrCancel = false;
+
+  /// آیا صفحه فعلی متن OCR (کش‌شده) دارد — برای دکمه «متن صفحه».
+  bool _ocrPageReady = false;
+
+  /// متن انتخاب‌شده در برگه متن OCR.
+  String _ocrSelection = '';
+
   @override
   void initState() {
     super.initState();
+    _bookKey = _makeBookKey();
     _open();
+  }
+
+  String _makeBookKey() {
+    int size = 0;
+    try {
+      size = File(widget.path).lengthSync();
+    } catch (_) {}
+    return OcrTextTools.cacheKeyFor(path: widget.path, fileSize: size);
   }
 
   @override
@@ -99,6 +144,7 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
       });
       unawaited(_loadOutline(doc));
       unawaited(_probeTextLayer(doc));
+      unawaited(_refreshOcrPageFlag());
     } catch (e) {
       if (mounted) setState(() => _error = _friendlyOpenError(e));
     }
@@ -176,17 +222,61 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
     }
   }
 
-  /// خواندن متن یک صفحه، با کش
+  /// خواندن متن یک صفحه، با کش.
+  ///
+  /// ترتیب: کش حافظه ← لایه متنی سند ← کش فایلی OCR. موتور OCR اینجا
+  /// صدا زده نمی‌شود؛ فقط نتیجه‌ای که کاربر قبلاً خواسته خوانده
+  /// می‌شود، پس جستجو و probe گران تمام نمی‌شوند.
   Future<String?> _pageText(PdfDocument doc, int pageNumber) async {
     final cached = _textCache[pageNumber];
     if (cached != null) return cached;
+    String? text;
     try {
-      final text = (await doc.pages[pageNumber - 1].loadText())?.fullText;
-      if (text != null) _textCache[pageNumber] = text;
-      return text;
+      text = (await doc.pages[pageNumber - 1].loadText())?.fullText;
+    } catch (_) {
+      text = null;
+    }
+    if (text == null || text.trim().isEmpty) {
+      text = await _ocrCachedText(pageNumber);
+    }
+    if (text != null && text.isNotEmpty) {
+      _textCache[pageNumber] = text;
+    }
+    return text;
+  }
+
+  /// متن OCR کش‌شده یک صفحه، بدون اجرای موتور.
+  Future<String?> _ocrCachedText(int pageNumber) async {
+    if (_bookKey.isEmpty) return null;
+    try {
+      final dir = await _ocrCacheDir();
+      final text = await _ocrService.readCache(
+        bookKey: _bookKey,
+        pageNumber: pageNumber,
+        cacheDir: dir,
+      );
+      return (text == null || text.isEmpty) ? null : text;
     } catch (_) {
       return null;
     }
+  }
+
+  /// آیا صفحه فعلی متن OCR (کش‌شده) دارد؟
+  Future<void> _refreshOcrPageFlag() async {
+    final ready = await _ocrCachedText(_page) != null;
+    if (!mounted) return;
+    if (ready != _ocrPageReady) setState(() => _ocrPageReady = ready);
+  }
+
+  /// بعد از OCR: کش حافظه را خالی و probe را دوباره می‌دوانیم تا بنر،
+  /// جستجو و دکمه متن صفحه وضعیت تازه را ببینند.
+  Future<void> _refreshAfterOcr() async {
+    final doc = _doc;
+    if (doc == null || !mounted) return;
+    _textCache.clear();
+    setState(() => _textProbeDone = false);
+    await _probeTextLayer(doc);
+    await _refreshOcrPageFlag();
   }
 
   bool get _isScanned =>
@@ -196,6 +286,7 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
     if (page == null || page == _page) return;
     setState(() => _page = page);
     _saveProgress(page);
+    unawaited(_refreshOcrPageFlag());
   }
 
   void _saveProgress(int p) {
@@ -468,8 +559,13 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
   // ── جستجو ──
 
   Future<void> _openSearch() async {
-    if (_isScanned) {
-      _toast('این PDF اسکن‌شده است و متن قابل جستجو ندارد', error: true);
+    if (_textProbeDone && _pagesWithText == 0) {
+      _toast(
+        _isScanned
+            ? 'متنی برای جستجو نیست — از بنر بالا «استخراج متن با OCR» را بزن'
+            : 'متنی برای جستجو پیدا نشد',
+        error: true,
+      );
       return;
     }
     final ctrl = TextEditingController();
@@ -749,26 +845,209 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
     );
   }
 
-  /// هشدار برای کتاب اسکن‌شده
+  /// هشدار برای کتاب اسکن‌شده، با راه استخراج متن.
   Widget _scannedBanner() => Material(
         color: Colors.orange.withValues(alpha: 0.14),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(Icons.info_outline,
-                  size: 18, color: Colors.orange.shade200),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'این PDF اسکن‌شده است؛ جستجو، هایلایت متنی و دیکشنری روی آن کار نمی‌کند.',
-                  style: TextStyle(fontSize: 12, color: Colors.orange.shade100),
-                ),
+              Row(
+                children: [
+                  Icon(Icons.info_outline,
+                      size: 18, color: Colors.orange.shade200),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'این PDF اسکن‌شده است؛ جستجو، هایلایت متنی و دیکشنری روی آن کار نمی‌کند.',
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.orange.shade100),
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 2),
+              if (_ocrRunning)
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'در حال خواندن… صفحه $_ocrDone از $_total',
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.orange.shade100),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: _cancelOcr,
+                      child: const Text('لغو'),
+                    ),
+                  ],
+                )
+              else
+                Wrap(
+                  spacing: 4,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _runOcrAll,
+                      icon: const Icon(Icons.document_scanner_outlined,
+                          size: 18),
+                      label: const Text('استخراج متن با OCR'),
+                    ),
+                    if (_ocrPageReady)
+                      TextButton.icon(
+                        onPressed: _openOcrText,
+                        icon: const Icon(Icons.article_outlined, size: 18),
+                        label: const Text('متن این صفحه'),
+                      ),
+                  ],
+                ),
             ],
           ),
         ),
       );
+
+  void _cancelOcr() {
+    if (!_ocrRunning) return;
+    setState(() => _ocrCancel = true);
+  }
+
+  /// استخراج متن همه صفحات با OCR، با پیشرفت و امکان لغو.
+  ///
+  /// صفحه‌هایی که قبلاً خوانده شده‌اند از کش می‌آیند و دوباره‌کاری
+  /// نمی‌شود، پس لغو و ادامه‌دادن بی‌هزینه است.
+  Future<void> _runOcrAll() async {
+    final doc = _doc;
+    if (doc == null || _ocrRunning || _bookKey.isEmpty) return;
+    Directory cacheDir;
+    try {
+      cacheDir = await _ocrCacheDir();
+    } catch (_) {
+      _toast('پوشه کش در دسترس نیست', error: true);
+      return;
+    }
+    setState(() {
+      _ocrRunning = true;
+      _ocrDone = 0;
+      _ocrCancel = false;
+    });
+    var ok = 0;
+    try {
+      for (var p = 1; p <= _total; p++) {
+        if (_ocrCancel || !mounted) break;
+        setState(() => _ocrDone = p);
+        try {
+          final text = await _ocrService.recognizePage(
+            doc: doc,
+            pageNumber: p,
+            bookKey: _bookKey,
+            cacheDir: cacheDir,
+          );
+          if (text.trim().isNotEmpty) ok++;
+        } catch (_) {
+          // یک صفحه خراب نباید کل کار را متوقف کند
+        }
+      }
+    } finally {
+      if (!mounted) return;
+      setState(() => _ocrRunning = false);
+      await _refreshAfterOcr();
+      if (!mounted) return;
+      if (_ocrCancel) {
+        _toast('متوقف شد — خوانده‌شده‌ها ذخیره ماندند');
+      } else if (ok == 0 && _total > 0) {
+        _toast('موتور OCR متنی پیدا نکرد', error: true);
+      } else {
+        _toast('متن صفحات استخراج شد');
+      }
+    }
+  }
+
+  /// اجرای یک عمل روی متن انتخاب‌شده در برگه OCR.
+  ///
+  /// برخلاف نوار انتخاب viewer، اینجا نباید به `_selectedText` برگردیم؛
+  /// اگر چیزی انتخاب نشده، صریح می‌گوییم.
+  void _actOnOcrSelection(void Function(String text) action) {
+    final t = _ocrSelection.trim();
+    if (t.isEmpty) {
+      _toast('اول متنی را انتخاب کن');
+      return;
+    }
+    action(_ocrSelection);
+  }
+
+  /// نمایش متن OCR صفحه فعلی با امکان انتخاب، دیکشنری، هایلایت و کپی.
+  Future<void> _openOcrText() async {
+    final text = _textCache[_page] ?? await _ocrCachedText(_page);
+    if (!mounted) return;
+    if (text == null || text.isEmpty) {
+      _toast('متنی برای این صفحه نیست', error: true);
+      return;
+    }
+    _ocrSelection = '';
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+      ),
+      builder: (c) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.7,
+        builder: (c, controller) => Column(
+          children: [
+            const SizedBox(height: 10),
+            _grabber(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+              child: Row(
+                children: [
+                  Text('متن صفحه $_page (OCR)',
+                      style: Theme.of(c).textTheme.titleMedium),
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                controller: controller,
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                child: SelectableText(
+                  text,
+                  textDirection: TextDirection.rtl,
+                  style: const TextStyle(fontSize: 16, height: 2.0),
+                  onSelectionChanged: (sel, _) =>
+                      _ocrSelection = sel.textInside(text),
+                ),
+              ),
+            ),
+            SafeArea(
+              top: false,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton.icon(
+                    onPressed: () => _actOnOcrSelection(_lookupSelection),
+                    icon: const Icon(Icons.menu_book_outlined, size: 18),
+                    label: const Text('دیکشنری'),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => _actOnOcrSelection(_highlightSelection),
+                    icon: const Icon(Icons.highlight_alt, size: 18),
+                    label: const Text('هایلایت'),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => _actOnOcrSelection(_copySelection),
+                    icon: const Icon(Icons.copy, size: 18),
+                    label: const Text('کپی'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   /// نوار عملیات روی متن انتخابی
   Widget _selectionBar() {

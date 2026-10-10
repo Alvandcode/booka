@@ -674,6 +674,15 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.2.1"
+  tesseract_ocr:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "0053efc6a7a2a2c2f8e47bc299ab1de134932d48"
+      url: "https://github.com/Alvandcode/tesseract_ocr.git"
+    source: git
+    version: "0.5.0"
   test_api:
     dependency: transitive
     description:

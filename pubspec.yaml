@@ -27,6 +27,13 @@ dependencies:
   sqflite: ^2.3.0
   flutter_widget_from_html_core: ^0.16.1
   pdfrx: ^2.6.5
+  # fork از tesseract_ocr رسمی: تنها تفاوت، جایگزینی jcenter() حذف‌شده
+  # با mavenCentral() در android/build.gradle برای سازگاری با Gradle 9 است.
+  # اگر upstream درستش کند، به نسخه pub برمی‌گردیم.
+  tesseract_ocr:
+    git:
+      url: https://github.com/Alvandcode/tesseract_ocr.git
+      ref: master
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +59,11 @@ flutter:
   uses-material-design: true
   assets:
     - assets/dict/en_fa.json
+    # مدل‌های OCR آفلاین (tessdata_fast، مجموعاً حدود ۴ مگابایت).
+    # پلاگین tesseract_ocr خودش از روی tessdata_config.json آن‌ها را
+    # به حافظه داخلی اپ کپی می‌کند.
+    - assets/tessdata_config.json
+    - assets/tessdata/
   fonts:
     - family: Vazirmatn
       fonts:

@@ -66,6 +66,7 @@ Booka برای یک کار ساخته شده: **خواندن کتاب روی گ�
 |---|---|---|
 | 📚 | **PDF & EPUB library** with real covers, authors, resume-from-last-position | **کتابخانه PDF و EPUB** با کاور و نویسنده واقعی و ادامه از آخرین موقعیت |
 | 📄 | **Real PDF text**: selection, in-book search, outline, visible highlights (PDFium) | **متن واقعی PDF**: انتخاب، جستجوی درون‌کتاب، فهرست و هایلایت قابل دیدن (موتور PDFium) |
+| 👁️ | **On-device OCR for scans** (Persian + English, Tesseract): extract page text, then search it and read it with dictionary/highlight | **OCR روی گوشی برای اسکن‌ها** (فارسی و انگلیسی): استخراج متن صفحه، بعد جستجو و خواندن با دیکشنری و هایلایت |
 | 📖 | **EPUB rich + plain modes**, hierarchical TOC, search, font size 12–22 | **دو حالت قالب‌بندی و ساده**، فهرست سلسله‌مراتبی، جستجو و فونت ۱۲ تا ۲۲ |
 | 🔖 | **Bookmarks & highlights** with full-text search, jump-to-source, delete | **نشان و هایلایت** با جستجوی متن کامل، پرش به محل اصلی و حذف |
 | 🔤 | **Offline EN→FA dictionary**: 36,122 entries, stemming, device TTS, one-tap Leitner cards | **دیکشنری آفلاین**: ۳۶٬۱۲۲ مدخل، ریشه‌یابی، تلفظ و ساخت کارت لایتنر |
@@ -78,11 +79,11 @@ Booka برای یک کار ساخته شده: **خواندن کتاب روی گ�
 
 ## ✅ Requirements | نیازها
 
-**EN:** Android **7.0+**, ~30 MB free for a per-ABI APK (~80 MB for the universal one). No internet needed. For pronunciation, any on-device speech engine (e.g. Google Text-to-Speech).
+**EN:** Android **7.0+**, ~40 MB free for a per-ABI APK (~90 MB for the universal one with the OCR engine). No internet needed. For pronunciation, any on-device speech engine (e.g. Google Text-to-Speech).
 
 <div dir="rtl" lang="fa">
 
-**FA:** اندروید **۷ به بالا**، حدود ۳۰ مگ فضای خالی برای نسخه مخصوص معماری (حدود ۸۰ مگ برای نسخه یکپارچه). بدون نیاز به اینترنت. برای تلفظ کلمات، هر موتور گفتار روی گوشی کافی است.
+**FA:** اندروید **۷ به بالا**، حدود ۴۰ مگ فضای خالی برای نسخه مخصوص معماری (حدود ۹۰ مگ برای نسخه یکپارچه با موتور OCR). بدون نیاز به اینترنت. برای تلفظ کلمات، هر موتور گفتار روی گوشی کافی است.
 
 </div>
 
@@ -126,11 +127,11 @@ sha256sum app-universal-release.apk
 
 ## 📄 PDF Reader | ریدر PDF
 
-**EN:** Real text selection (PDFium engine) — select to get **dictionary**, **highlight** and **copy**. In-book search runs after a short pause so big books stay fast; the outline jumps you between chapters; **My Highlights** lists this book’s highlights and paints the tapped one back onto its page. Scanned (image-only) PDFs are detected and labeled — text features can’t work on photos, and the app tells you instead of failing silently.
+**EN:** Real text selection (PDFium engine) — select to get **dictionary**, **highlight** and **copy**. In-book search runs after a short pause so big books stay fast; the outline jumps you between chapters; **My Highlights** lists this book’s highlights and paints the tapped one back onto its page. Scanned (image-only) PDFs are detected and labeled — text features can’t work on photos, and the app tells you instead of failing silently. With one tap, **on-device OCR** (Persian + English) extracts a page’s text so it becomes searchable and readable with dictionary and highlight.
 
 <div dir="rtl" lang="fa">
 
-**FA:** انتخاب متن واقعی (موتور PDFium) — با انتخاب، سه دکمه **دیکشنری**، **هایلایت** و **کپی** می‌آید. جستجو با کمی مکث اجرا می‌شود تا کتاب‌های بزرگ کند نشوند؛ فهرست مطالب بین فصل‌ها می‌پرد؛ **هایلایت‌های من** هایلایت‌های همین کتاب را فهرست می‌کند و با لمس، همان متن را روی صفحه زرد می‌کند. PDF اسکن‌شده (فقط عکس) تشخیص داده و برچسب می‌خورد — قابلیت‌های متنی روی عکس جواب نمی‌دهند و اپ به‌جای سکوت، این را می‌گوید.
+**FA:** انتخاب متن واقعی (موتور PDFium) — با انتخاب، سه دکمه **دیکشنری**، **هایلایت** و **کپی** می‌آید. جستجو با کمی مکث اجرا می‌شود تا کتاب‌های بزرگ کند نشوند؛ فهرست مطالب بین فصل‌ها می‌پرد؛ **هایلایت‌های من** هایلایت‌های همین کتاب را فهرست می‌کند و با لمس، همان متن را روی صفحه زرد می‌کند. PDF اسکن‌شده (فقط عکس) تشخیص داده و برچسب می‌خورد — قابلیت‌های متنی روی عکس جواب نمی‌دهند و اپ به‌جای سکوت، این را می‌گوید. با یک لمس، **OCR روی گوشی** (فارسی و انگلیسی) متن صفحه را استخراج می‌کند تا قابل جستجو و خواندن با دیکشنری و هایلایت شود.
 
 </div>
 
