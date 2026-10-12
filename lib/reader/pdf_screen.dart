@@ -949,16 +949,22 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
         }
       }
     } finally {
-      if (!mounted) return;
-      setState(() => _ocrRunning = false);
-      await _refreshAfterOcr();
-      if (!mounted) return;
-      if (_ocrCancel) {
-        _toast('متوقف شد — خوانده‌شده‌ها ذخیره ماندند');
-      } else if (ok == 0 && _total > 0) {
-        _toast('موتور OCR متنی پیدا نکرد', error: true);
-      } else {
-        _toast('متن صفحات استخراج شد');
+      // بدون return در finally: return اینجا استثناهای در جریان را می‌بلعد
+      // و مسیر خطای واقعی را پنهان می‌کند.
+      if (mounted) {
+        setState(() => _ocrRunning = false);
+        if (mounted) {
+          await _refreshAfterOcr();
+          if (mounted) {
+            if (_ocrCancel) {
+              _toast('متوقف شد — خوانده‌شده‌ها ذخیره ماندند');
+            } else if (ok == 0 && _total > 0) {
+              _toast('موتور OCR متنی پیدا نکرد', error: true);
+            } else {
+              _toast('متن صفحات استخراج شد');
+            }
+          }
+        }
       }
     }
   }

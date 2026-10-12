@@ -16,7 +16,7 @@ class AppInfo {
   static const String tagline = 'کتابخوان آفلاین';
 
   /// باید با نسخه در pubspec.yaml یکی باشد
-  static const String version = '0.1.3';
+  static const String version = '0.1.4';
 
   /// شماره ساخت — باید یک واحد جلوتر از آخرین انتشار باشد
   static const String build = '4';
