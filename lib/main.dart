@@ -17,6 +17,9 @@ import 'privacy_page.dart';
 import 'reader/epub_document.dart';
 import 'reader/epub_screen.dart';
 import 'reader/pdf_screen.dart';
+import 'speech/speech_providers.dart';
+import 'speech/speech_service.dart';
+import 'speech/voice_sheet.dart';
 import 'theme/paper_glass_theme.dart';
 
 void main() {
@@ -276,6 +279,14 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             child: SearchBar(
               hintText: 'جستجو در کتاب‌های آفلاین...',
               leading: const Icon(Icons.search),
+              trailing: [
+                VoiceButton(
+                  service: SpeechService(ref.watch(speechEngineProvider)),
+                  label: 'جستجوی صوتی',
+                  onResult: (t) =>
+                      ref.read(librarySearchProvider.notifier).state = t,
+                ),
+              ],
               onChanged: (v) =>
                   ref.read(librarySearchProvider.notifier).state = v,
             ),

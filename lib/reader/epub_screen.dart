@@ -10,6 +10,10 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 
 import '../data/store.dart';
 import '../dictionary/dictionary_sheet.dart';
+import '../speech/speech_commands.dart';
+import '../speech/speech_providers.dart';
+import '../speech/speech_service.dart';
+import '../speech/voice_sheet.dart';
 import 'epub_document.dart';
 import 'epub_text.dart';
 
@@ -143,6 +147,38 @@ class _EpubReaderScreenState extends ConsumerState<EpubReaderScreen> {
         );
   }
 
+  // ── دستور صوتی ──
+
+  Future<void> _voiceCommand() async {
+    final speech = SpeechService(ref.read(speechEngineProvider));
+    final ok = await speech.initialize();
+    if (!ok) {
+      _toast(speech.lastError ?? 'تشخیص گفتار در دسترس نیست', error: true);
+      return;
+    }
+    _toast('در حال گوش‌دادن... بگویید: بعدی، قبلی، خروج');
+    final result = await speech.listenForCommand();
+    if (!mounted) return;
+    switch (result.command) {
+      case SpeechCommand.next:
+        _goTo(_section + 1);
+        break;
+      case SpeechCommand.previous:
+        _goTo(_section - 1);
+        break;
+      case SpeechCommand.exitReader:
+        Navigator.pop(context);
+        break;
+      case null:
+        if (result.raw.trim().isNotEmpty) {
+          _toast('دستور نشناخته: «${result.raw}»');
+        }
+        break;
+      default:
+        _toast('این دستور هنوز پشتیبانی نمی‌شود');
+    }
+  }
+
   void _addBookmark() {
     ref.read(bookmarksProvider.notifier).add(BookmarkEntry(
           book: _displayTitle,
@@ -154,9 +190,14 @@ class _EpubReaderScreenState extends ConsumerState<EpubReaderScreen> {
     _toast('🔖 نشان ذخیره شد — در تب نشان‌ها ببین');
   }
 
-  void _toast(String message) {
+  void _toast(String message, {bool error = false}) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: error ? Theme.of(context).colorScheme.error : null,
+      ),
+    );
   }
 
   String _firstWord(String s) {
@@ -287,6 +328,7 @@ class _EpubReaderScreenState extends ConsumerState<EpubReaderScreen> {
     if (doc == null) return;
     final ctrl = TextEditingController();
     List<SearchHit> hits = const [];
+    final speech = SpeechService(ref.read(speechEngineProvider));
 
     await showModalBottomSheet<void>(
       context: context,
@@ -334,11 +376,19 @@ class _EpubReaderScreenState extends ConsumerState<EpubReaderScreen> {
                   controller: ctrl,
                   autofocus: true,
                   textInputAction: TextInputAction.search,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'جستجو در متن کتاب...',
-                    prefixIcon: Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: VoiceButton(
+                      service: speech,
+                      label: 'جستجوی صوتی',
+                      onResult: (t) {
+                        ctrl.text = t;
+                        run(t);
+                      },
+                    ),
                     isDense: true,
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                   onChanged: run,
                 ),
@@ -540,6 +590,11 @@ class _EpubReaderScreenState extends ConsumerState<EpubReaderScreen> {
             tooltip: 'جستجو در کتاب',
             icon: const Icon(Icons.search),
             onPressed: _openSearch,
+          ),
+          IconButton(
+            tooltip: 'دستور صوتی',
+            icon: const Icon(Icons.mic_none_outlined),
+            onPressed: _voiceCommand,
           ),
           IconButton(
             tooltip: 'نشان‌گذاری',

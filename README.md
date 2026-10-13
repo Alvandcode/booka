@@ -67,13 +67,14 @@ Booka برای یک کار ساخته شده: **خواندن کتاب روی گ�
 | 📚 | **PDF & EPUB library** with real covers, authors, resume-from-last-position | **کتابخانه PDF و EPUB** با کاور و نویسنده واقعی و ادامه از آخرین موقعیت |
 | 📄 | **Real PDF text**: selection, in-book search, outline, visible highlights (PDFium) | **متن واقعی PDF**: انتخاب، جستجوی درون‌کتاب، فهرست و هایلایت قابل دیدن (موتور PDFium) |
 | 👁️ | **On-device OCR for scans** (Persian + English, Tesseract): extract page text, then search it and read it with dictionary/highlight | **OCR روی گوشی برای اسکن‌ها** (فارسی و انگلیسی): استخراج متن صفحه، بعد جستجو و خواندن با دیکشنری و هایلایت |
+| 🎙️ | **Voice search & commands** (on-device speech recognition): dictate a book or word, or say «بخوان» / «بعدی» / «توقف» to control reading | **جستجو و دستور صوتی** (تشخیص گفتار روی گوشی): جستجوی کتاب یا کلمه با دهان، یا گفتن «بخوان» / «بعدی» / «توقف» برای کنترل خواندن |
 | 📖 | **EPUB rich + plain modes**, hierarchical TOC, search, font size 12–22 | **دو حالت قالب‌بندی و ساده**، فهرست سلسله‌مراتبی، جستجو و فونت ۱۲ تا ۲۲ |
 | 🔖 | **Bookmarks & highlights** with full-text search, jump-to-source, delete | **نشان و هایلایت** با جستجوی متن کامل، پرش به محل اصلی و حذف |
 | 🔤 | **Offline EN→FA dictionary**: 36,122 entries, stemming, device TTS, one-tap Leitner cards | **دیکشنری آفلاین**: ۳۶٬۱۲۲ مدخل، ریشه‌یابی، تلفظ و ساخت کارت لایتنر |
 | 🗂️ | **SM-2 Leitner**: due-only daily review, Excel/Anki CSV export | **لایتنر SM-2**: مرور روزانه فقط سررسیده‌ها، خروجی CSV |
 | 🎨 | **4 themes** (paper, sepia, grey night, AMOLED) + Vazirmatn typography | **۴ تم** (کاغذی، سپیا، خاکستری شب، AMOLED) با فونت وزیرمتن |
 | 💾 | **Backup & export**: full JSON (merge or replace) + readable Markdown/CSV | **بکاپ و خروجی**: JSON کامل (ادغام یا جایگزینی) + Markdown و CSV خوانا |
-| 🛡️ | **Zero permissions** in release; no account, ads, analytics or internet | **صفر دسترسی** در نسخه انتشار؛ بدون حساب، تبلیغ، تحلیلگر و اینترنت |
+| 🛡️ | **No permissions** except microphone, and only when you tap the mic for voice search; no account, ads, analytics or internet | **بدون دسترسی** به‌جز میکروفون، و فقط هنگام استفاده از جستجوی صوتی؛ بدون حساب، تبلیغ، تحلیلگر و اینترنت |
 
 ---
 
@@ -203,8 +204,8 @@ persistence,پشتکار,Book Title,Persistence is a virtue …,6,2026-10-08,2.5
 
 ## 🛡️ Privacy | حریم خصوصی
 
-- **EN:** The release build requests **zero Android permissions** — no INTERNET, no storage, nothing. No account, no ads, no analytics. The dictionary lives inside the app; no word ever leaves your device. Pronunciation runs on your OS speech engine. Deleting the app wipes everything — back up first from Settings.
-- **FA:** نسخه انتشار **هیچ دسترسی اندروید** نمی‌خواهد — نه اینترنت، نه حافظه، هیچ‌چیز. بدون حساب، تبلیغ و تحلیلگر. دیکشنری داخل خود اپ است؛ هیچ کلمه‌ای به جایی ارسال نمی‌شود. تلفظ با موتور خود سیستم‌عامل است. با حذف اپ همه‌چیز پاک می‌شود — اول از تنظیمات بکاپ بگیر.
+- **EN:** The release build requests **no Android permissions** except `RECORD_AUDIO`, and that only when you tap the microphone for voice search — no INTERNET, no storage, nothing else. No account, no ads, no analytics. The dictionary lives inside the app; no word ever leaves your device. Pronunciation runs on your OS speech engine. Deleting the app wipes everything — back up first from Settings.
+- **FA:** نسخه انتشار **هیچ دسترسی اندروید** نمی‌خواهد به‌جز `RECORD_AUDIO`، و آن فقط هنگام زدن میکروفون برای جستجوی صوتی — نه اینترنت، نه حافظه، هیچ‌چیز دیگر. بدون حساب، تبلیغ و تحلیلگر. دیکشنری داخل خود اپ است؛ هیچ کلمه‌ای به جایی ارسال نمی‌شود. تلفظ با موتور خود سیستم‌عامل است. با حذف اپ همه‌چیز پاک می‌شود — اول از تنظیمات بکاپ بگیر.
 
 ---
 
@@ -267,7 +268,7 @@ CI (`.github/workflows/release.yml`) checks out that tag, runs analyze + tests, 
 
 ## 🤝 Contributing | مشارکت
 
-**EN:** Issues and Pull Requests are welcome! Bug reports with repro steps get fixed fastest. Please keep the app’s promise: offline-first, zero permissions, no tracking.
+**EN:** Issues and Pull Requests are welcome! Bug reports with repro steps get fixed fastest. Please keep the app’s promise: offline-first, no permissions except the microphone for voice search, no tracking.
 
 <div dir="rtl" lang="fa">
 

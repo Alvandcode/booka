@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- تشخیص گفتار صوتی برای جستجو و دستورهای خواندن.
+         فقط در صورت استفاده از دکمه‌ی میکروفون درخواست می‌شود. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <application
         android:label="Booka"
         android:name="${applicationName}"

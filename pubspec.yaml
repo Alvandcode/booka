@@ -1,7 +1,7 @@
 name: book_reader_app
 description: "کتابخوان آفلاین PDF و EPUB - Paper & Glass"
 publish_to: 'none'
-version: 0.1.4+5
+version: 0.1.5+6
 
 environment:
   # flutter_widget_from_html_core حداقل Dart 3.4 و Flutter 3.22 می‌خواهد
@@ -32,6 +32,10 @@ dependencies:
   # است که با آن v0.1.0 تا v0.1.2 سبز منتشر شدند.
   path_provider_android: 2.2.15
   shared_preferences: ^2.2.3
+  # تشخیص گفتار روی‌دستگاه برای جستجو و دستورهای خواندن؛ معادل درون‌اپی
+  # قابلیت دیکتهٔ آفلاین SayTo برای ویندوز. نسخهٔ ۷ سریع نگهداری می‌شود
+  # (آخرین انتشار: سپتامبر ۲۰۲۶) و با Flutter 3.47 سازگار است.
+  speech_to_text: ^7.5.0
   sqflite: ^2.3.0
   flutter_widget_from_html_core: ^0.16.1
   pdfrx: ^2.6.5

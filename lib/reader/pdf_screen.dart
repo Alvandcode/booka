@@ -11,6 +11,10 @@ import '../data/store.dart';
 import '../dictionary/dictionary_sheet.dart';
 import '../ocr/ocr_service.dart';
 import '../ocr/ocr_text.dart';
+import '../speech/speech_commands.dart';
+import '../speech/speech_providers.dart';
+import '../speech/speech_service.dart';
+import '../speech/voice_sheet.dart';
 import 'pdf_text.dart';
 
 /// ریدر PDF بر پایه pdfrx — انتخاب متن، هایلایت واقعی، جستجو، دیکشنری
@@ -556,6 +560,38 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
     _saveProgress(page);
   }
 
+  // ── دستور صوتی ──
+
+  Future<void> _voiceCommand() async {
+    final speech = SpeechService(ref.read(speechEngineProvider));
+    final ok = await speech.initialize();
+    if (!ok) {
+      _toast(speech.lastError ?? 'تشخیص گفتار در دسترس نیست', error: true);
+      return;
+    }
+    _toast('در حال گوش‌دادن... بگویید: بعدی، قبلی، خروج');
+    final result = await speech.listenForCommand();
+    if (!mounted) return;
+    switch (result.command) {
+      case SpeechCommand.next:
+        _goToPage(_page + 1);
+        break;
+      case SpeechCommand.previous:
+        _goToPage(_page - 1);
+        break;
+      case SpeechCommand.exitReader:
+        Navigator.pop(context);
+        break;
+      case null:
+        if (result.raw.trim().isNotEmpty) {
+          _toast('دستور نشناخته: «${result.raw}»');
+        }
+        break;
+      default:
+        _toast('این دستور هنوز پشتیبانی نمی‌شود');
+    }
+  }
+
   // ── جستجو ──
 
   Future<void> _openSearch() async {
@@ -569,6 +605,7 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
       return;
     }
     final ctrl = TextEditingController();
+    final speech = SpeechService(ref.read(speechEngineProvider));
 
     await showModalBottomSheet<void>(
       context: context,
@@ -616,11 +653,19 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
                   controller: ctrl,
                   autofocus: true,
                   textInputAction: TextInputAction.search,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'جستجو در متن کتاب...',
-                    prefixIcon: Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: VoiceButton(
+                      service: speech,
+                      label: 'جستجوی صوتی',
+                      onResult: (t) {
+                        ctrl.text = t;
+                        run(t);
+                      },
+                    ),
                     isDense: true,
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                   onChanged: run,
                 ),
@@ -758,6 +803,11 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
             tooltip: 'جستجو در کتاب',
             icon: const Icon(Icons.search),
             onPressed: _openSearch,
+          ),
+          IconButton(
+            tooltip: 'دستور صوتی',
+            icon: const Icon(Icons.mic_none_outlined),
+            onPressed: _voiceCommand,
           ),
           IconButton(
             tooltip: 'هایلایت‌های من',
